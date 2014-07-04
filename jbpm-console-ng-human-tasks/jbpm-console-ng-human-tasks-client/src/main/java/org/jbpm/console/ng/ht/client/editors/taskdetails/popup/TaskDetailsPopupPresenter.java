@@ -157,11 +157,6 @@ public class TaskDetailsPopupPresenter {
                             final int priority ) {
 
         if ( taskId > 0 ) {
-            List<String> descriptions = new ArrayList<String>();
-            descriptions.add( taskDescription );
-
-            List<String> names = new ArrayList<String>();
-            names.add( taskName );
 
             taskServices.call( new RemoteCallback<Void>() {
                 @Override
@@ -169,7 +164,7 @@ public class TaskDetailsPopupPresenter {
                     view.displayNotification( "Task Details Updated for Task id = " + taskId + ")" );
                     userTaskChanges.fire( new TaskRefreshedEvent( taskId ) );
                 }
-            } ).updateSimpleTaskDetails( taskId, names, Integer.valueOf( priority ), descriptions,
+            } ).updateSimpleTaskDetails( taskId, taskName, Integer.valueOf( priority ), taskDescription,
                                          // subTaskStrategy,
                                          dueDate );
 

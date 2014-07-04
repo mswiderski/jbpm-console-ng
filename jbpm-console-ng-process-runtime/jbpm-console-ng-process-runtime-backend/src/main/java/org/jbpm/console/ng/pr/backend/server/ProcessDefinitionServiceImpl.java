@@ -26,8 +26,9 @@ import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.ga.model.QueryFilter;
 import org.jbpm.console.ng.pr.model.ProcessSummary;
 import org.jbpm.console.ng.pr.service.ProcessDefinitionService;
-import org.jbpm.kie.services.api.RuntimeDataService;
-import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
+
+import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.model.ProcessDefinition;
 import org.uberfire.paging.PageResponse;
 
 /**
@@ -44,9 +45,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
   @Override
   public PageResponse<ProcessSummary> getData(final QueryFilter filter) {
     PageResponse<ProcessSummary> response = new PageResponse<ProcessSummary>();
-    Collection<ProcessAssetDesc> processDefs = dataService.getProcesses();
+    Collection<ProcessDefinition> processDefs = dataService.getProcesses();
     List<ProcessSummary> processDefsSums = new ArrayList<ProcessSummary>(processDefs.size());
-    for (ProcessAssetDesc pd : processDefs) {
+    for (ProcessDefinition pd : processDefs) {
 
       if (filter.getParams() == null || filter.getParams().get("textSearch") == null || ((String) filter.getParams().get("textSearch")).isEmpty()) {
         processDefsSums.add(ProcessHelper.adapt(pd));

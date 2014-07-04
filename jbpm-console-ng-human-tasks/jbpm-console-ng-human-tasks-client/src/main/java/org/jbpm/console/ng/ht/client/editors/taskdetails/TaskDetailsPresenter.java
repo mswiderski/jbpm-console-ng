@@ -197,7 +197,7 @@ public class TaskDetailsPresenter {
                       ErrorPopup.showMessage("Unexpected error encountered : " + throwable.getMessage());
                       return true;
                   }
-              }).updateSimpleTaskDetails(currentTaskId, names, Integer.valueOf(priority), descriptions,
+              }).updateSimpleTaskDetails(currentTaskId, currentTaskName, Integer.valueOf(priority), taskDescription,
                     // subTaskStrategy,
                     dueDate);
 
@@ -286,7 +286,7 @@ public class TaskDetailsPresenter {
                   ErrorPopup.showMessage("Unexpected error encountered : " + throwable.getMessage());
                   return true;
               }
-          }).getAllTaskEvents(currentTaskId);
+          }).getAllTaskEvents(currentTaskId, null);
 
     }
     

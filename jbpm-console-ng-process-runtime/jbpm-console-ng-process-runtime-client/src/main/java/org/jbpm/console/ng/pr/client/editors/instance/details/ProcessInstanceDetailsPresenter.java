@@ -228,7 +228,7 @@ public class ProcessInstanceDetailsPresenter {
                   ErrorPopup.showMessage("Unexpected error encountered : " + throwable.getMessage());
                   return true;
               }
-          }).getProcessDesc(processDefId);
+          }).getProcessDesc(deploymentId, processDefId);
 
         dataServices.call(new RemoteCallback<ProcessInstanceSummary>() {
             @Override
@@ -471,6 +471,7 @@ public class ProcessInstanceDetailsPresenter {
                 PlaceRequest placeRequestImpl = new DefaultPlaceRequest("Process Variables List");
                 placeRequestImpl.addParameter("processInstanceId", view.getProcessInstanceIdText().getText());
                 placeRequestImpl.addParameter("processDefId", view.getProcessDefinitionIdText().getText());
+                placeRequestImpl.addParameter("deploymentId", view.getProcessDeploymentText().getText());
                 placeManager.goTo(placeRequestImpl);
             }
         }).endMenu().build().getItems().get(0));
