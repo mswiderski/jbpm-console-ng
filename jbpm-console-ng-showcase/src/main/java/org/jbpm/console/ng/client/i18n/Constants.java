@@ -94,5 +94,16 @@ public interface Constants extends Messages {
 
     String Server_Management();
 
+    String Case_Management();
+
+    String Cases();
+
+    String Grid_Base_Test();
+
+    String Documents();
+
+    String Data_Sets();
+
+    String Tasks_List_Drools();
 
 }

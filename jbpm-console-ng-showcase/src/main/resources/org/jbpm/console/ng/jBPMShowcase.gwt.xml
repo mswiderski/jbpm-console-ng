@@ -40,7 +40,7 @@
   <inherits name="org.kie.workbench.common.screens.datamodeller.KieWorkbenchDatamodellerClient"/>
   <inherits name="org.kie.workbench.common.widgets.decoratedgrid.KieWorkbenchDecoratedGridWidget"/>
   <inherits name="org.kie.workbench.common.screens.search.KieWorkbenchSearchScreenClient"/>
-  <inherits name="org.kie.workbench.common.screens.server.management.ServerManagementClient"/>
+  <inherits name="org.kie.workbench.common.workbench.KieDefaultWorkbenchClient"/>
 
   <inherits name="org.drools.workbench.screens.drltext.DroolsWorkbenchDRLTextEditorClient"/>
   <inherits name="org.drools.workbench.screens.workitems.DroolsWorkbenchWorkItemsEditorClient"/>
@@ -77,7 +77,7 @@
 
   <!-- kie server -->
   <inherits name="org.kie.workbench.common.screens.server.management.ServerManagementAPI"/>
-
+  <inherits name="org.kie.workbench.common.screens.server.management.ServerManagementClient"/>
 
   <!-- designer -->
   <inherits name="org.jbpm.designer.jBPMDesignerAPI"/>

@@ -23,7 +23,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.google.gson.Gson;
-import org.jbpm.console.ng.ga.forms.service.PlaceManagerActivityService;
+import org.kie.workbench.common.services.shared.service.PlaceManagerActivityService;
 import org.jbpm.formModeler.kie.services.form.ProcessDefinition;
 import org.jbpm.formModeler.kie.services.form.TaskDefinition;
 import org.jbpm.formModeler.kie.services.form.provider.AbstractFormProvider;
