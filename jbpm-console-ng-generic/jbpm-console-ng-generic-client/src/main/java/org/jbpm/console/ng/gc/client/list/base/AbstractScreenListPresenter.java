@@ -26,11 +26,9 @@ import javax.inject.Inject;
 
 /**
  * @param <T> data type for the AsyncDataProvider
- * @author salaboy
  */
 public abstract class AbstractScreenListPresenter<T> extends AbstractListPresenter<T> {
 
-    @Inject
     protected User identity;
 
     @Inject
@@ -51,6 +49,11 @@ public abstract class AbstractScreenListPresenter<T> extends AbstractListPresent
     @OnStartup
     public void onStartup( final PlaceRequest place ) {
         this.place = place;
+    }
+
+    @Inject
+    public void setIdentity(final User identity) {
+        this.identity = identity;
     }
 
 }

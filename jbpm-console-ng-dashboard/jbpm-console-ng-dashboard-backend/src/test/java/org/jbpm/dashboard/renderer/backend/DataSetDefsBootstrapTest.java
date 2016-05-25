@@ -25,6 +25,7 @@ import org.dashbuilder.dataset.DataSetManager;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.internal.identity.IdentityProvider;
@@ -81,7 +82,9 @@ public class DataSetDefsBootstrapTest {
         assertEquals(dataSetDefList.get(1).getUUID(), TASKS_MONITORING_DATASET);
     }
 
-    @Test
+
+    //TODO Needs redesign as data source is deployed to kie server
+    @Ignore
     public void procInstancesPreprocessorTest() {
         DataSetLookup lookup = DataSetLookupFactory.newDataSetLookupBuilder()
                 .dataset(PROCESSES_MONITORING_DATASET)
@@ -98,7 +101,8 @@ public class DataSetDefsBootstrapTest {
                 .buildLookup());
     }
 
-    @Test
+    //TODO Needs redesign as data source is deployed to kie server
+    @Ignore
     public void tasksPreprocessorTest() {
         DataSetLookup lookup = DataSetLookupFactory.newDataSetLookupBuilder()
                 .dataset(TASKS_MONITORING_DATASET)

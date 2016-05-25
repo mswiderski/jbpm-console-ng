@@ -52,8 +52,6 @@ public class DataSetDefsBootstrap {
     @Inject
     private KieServerIntegration kieServerIntegration;
 
-    private DisposableExecutor executor;
-
     private DataSetDef humanTasksDef;
     private DataSetDef humanTasksWithUserDef;
     private DataSetDef humanTaskWithAdminDef;
@@ -61,9 +59,7 @@ public class DataSetDefsBootstrap {
 
     @PostConstruct
     protected void registerDataSetDefinitions() {
-        executor = SimpleAsyncExecutorService.getDefaultInstance();
-
-        String jbpmDataSource = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
+        final String jbpmDataSource = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
 
         humanTasksDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(HUMAN_TASKS_DATASET)
@@ -127,7 +123,7 @@ public class DataSetDefsBootstrap {
                             "t.status, " +
                             "t.taskId, " +
                             "t.workItemId, " +
-                            "oe.id as OEID " +
+                            "oe.id " +
                         "from " +
                             "AuditTaskImpl t, " +
                             "PeopleAssignments_PotOwners po, " +
@@ -175,7 +171,7 @@ public class DataSetDefsBootstrap {
                             "t.status, " +
                             "t.taskId, " +
                             "t.workItemId, " +
-                            "oe.id as OEID " +
+                            "oe.id " +
                         "from " +
                             "AuditTaskImpl t, " +
                             "PeopleAssignments_BAs bas, " +
@@ -240,9 +236,7 @@ public class DataSetDefsBootstrap {
     }
 
     public void registerInKieServer(@Observes final ServerInstanceUpdated serverInstanceUpdated) {
-
-
-        executor.execute(new Runnable() {
+        SimpleAsyncExecutorService.getDefaultInstance().execute(new Runnable() {
             @Override
             public void run() {
 
@@ -313,4 +307,5 @@ public class DataSetDefsBootstrap {
         });
 
     }
+
 }

@@ -33,7 +33,6 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.api.model.events.ServerInstanceUpdated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uberfire.commons.async.DisposableExecutor;
 import org.uberfire.commons.async.SimpleAsyncExecutorService;
 import org.uberfire.commons.services.cdi.Startup;
 
@@ -51,16 +50,12 @@ public class DataSetDefsBootstrap {
     @Inject
     private KieServerIntegration kieServerIntegration;
 
-    private DisposableExecutor executor;
-
     private DataSetDef processInstancesDef;
     private DataSetDef processWithVariablesDef;
 
     @PostConstruct
     protected void registerDataSetDefinitions() {
-        executor = SimpleAsyncExecutorService.getDefaultInstance();
-
-        String jbpmDataSource = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
+        final String jbpmDataSource = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
 
         processInstancesDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(PROCESS_INSTANCE_DATASET)
@@ -138,8 +133,7 @@ public class DataSetDefsBootstrap {
     }
 
     public void registerInKieServer(@Observes final ServerInstanceUpdated serverInstanceUpdated) {
-
-        executor.execute(new Runnable() {
+        SimpleAsyncExecutorService.getDefaultInstance().execute(new Runnable() {
             @Override
             public void run() {
 

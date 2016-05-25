@@ -18,8 +18,6 @@ package org.jbpm.console.ng.ht.client.editors.taskslist.grid.dash;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import org.jboss.errai.security.shared.api.identity.User;
-import org.jbpm.console.ng.df.client.list.base.DataSetQueryHelper;
 import org.jbpm.console.ng.gc.client.menu.RestoreDefaultFiltersMenuBuilder;
 import org.jbpm.console.ng.ht.client.editors.quicknewtask.QuickNewTaskPopup;
 import org.jbpm.console.ng.ht.client.editors.taskslist.grid.AbstractTasksListGridPresenter;
@@ -39,17 +37,6 @@ public class DataSetTasksListGridPresenter extends AbstractTasksListGridPresente
 
     @Inject
     private QuickNewTaskPopup quickNewTaskPopup;
-
-    public DataSetTasksListGridPresenter() {
-        super();
-    }
-
-    public DataSetTasksListGridPresenter(final DataSetTaskListView view,
-                                         final DataSetQueryHelper dataSetQueryHelper,
-                                         final DataSetQueryHelper dataSetQueryHelperDomainSpecific,
-                                         final User identity) {
-        super(view, dataSetQueryHelper, dataSetQueryHelperDomainSpecific, identity);
-    }
 
     @WorkbenchMenu
     @Override

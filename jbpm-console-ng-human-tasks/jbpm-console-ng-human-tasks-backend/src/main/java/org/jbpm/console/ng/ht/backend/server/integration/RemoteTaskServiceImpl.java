@@ -175,6 +175,9 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
         summary.setActualOwner(task.getActualOwner());
         summary.setTaskName(task.getName());
         summary.setPotOwnersString(task.getPotentialOwners());
+        summary.setCreatedBy(task.getCreatedBy());
+        summary.setBusinessAdmins(task.getBusinessAdmins());
+        summary.setStatus(task.getStatus());
         return summary;
     }
 

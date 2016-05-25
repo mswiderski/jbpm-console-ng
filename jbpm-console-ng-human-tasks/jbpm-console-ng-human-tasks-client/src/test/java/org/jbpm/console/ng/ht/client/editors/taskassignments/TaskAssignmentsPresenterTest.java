@@ -15,16 +15,16 @@
  */
 package org.jbpm.console.ng.ht.client.editors.taskassignments;
 
+import java.util.Arrays;
 import javax.enterprise.event.Event;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.jbpm.console.ng.ht.client.i18n.Constants;
-import org.jbpm.console.ng.ht.model.TaskSummary;
+import org.jbpm.console.ng.ht.model.TaskAssignmentSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.TaskOperationsService;
 import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,10 +34,10 @@ import org.mockito.Mock;
 import org.uberfire.mocks.CallerMock;
 import org.uberfire.mocks.EventSourceMock;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.eq;
 
@@ -49,32 +49,30 @@ public class TaskAssignmentsPresenterTest {
 
     @Mock
     private TaskAssignmentsPresenter.TaskAssignmentsView viewMock;
+
     @Mock
     private User userMock;
+
     @Mock
-    private RemoteTaskService lifecycleServiceMock;
-    private Caller<RemoteTaskService> lifecycleServiceCallerMock;
-    @Mock
-    private TaskOperationsService operationsServiceMock;
-    private Caller<TaskOperationsService> operationsServiceCallerMock;
+    private RemoteTaskService remoteTaskService;
+
+    private Caller<RemoteTaskService> remoteTaskServiceCaller;
 
     //Thing under test
     private TaskAssignmentsPresenter presenter;
 
     @Before
     public void initMocks() {
-        when(userMock.getIdentifier())
-                .thenReturn(CURRENT_USER);
+        when(userMock.getIdentifier()).thenReturn(CURRENT_USER);
 
-        lifecycleServiceCallerMock = new CallerMock<RemoteTaskService>(lifecycleServiceMock);
-        operationsServiceCallerMock = new CallerMock<TaskOperationsService>(operationsServiceMock);
+        remoteTaskServiceCaller = new CallerMock<RemoteTaskService>(remoteTaskService);
         final Event<TaskRefreshedEvent> taskRefreshed = spy(new EventSourceMock<TaskRefreshedEvent>());
         doNothing().when(taskRefreshed).fire(any(TaskRefreshedEvent.class));
 
         presenter = new TaskAssignmentsPresenter(
-                viewMock, userMock,
-                lifecycleServiceCallerMock,
-                operationsServiceCallerMock,
+                viewMock,
+                userMock,
+                remoteTaskServiceCaller,
                 taskRefreshed
         );
     }
@@ -82,15 +80,12 @@ public class TaskAssignmentsPresenterTest {
     @Test
     public void delegationButtonDisabled_whenDelegationSuccessful() {
         final long TASK_ID = 1;
-        when(operationsServiceMock.getTaskDetails(TASK_ID))
-                .thenReturn(new TaskSummary(TASK_ID, null, null,
-                        "Completed"/*status*/, 0, CURRENT_USER/*actual owner*/,
-                        null, null, null, null, null, 0, 0, null, 0));
-        when(operationsServiceMock.allowDelegate(
-                eq(TASK_ID),
-                eq(CURRENT_USER),
-                anySet()))
-                .thenReturn(true);
+
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setTaskId(TASK_ID);
+        task.setStatus("InProgress");
+        task.setPotOwnersString(Arrays.asList(CURRENT_USER));
+        when(remoteTaskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_ID))).thenReturn(task);
 
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(1L));
         presenter.delegateTask(OTHER_USER);
@@ -104,7 +99,7 @@ public class TaskAssignmentsPresenterTest {
         presenter.delegateTask("");
 
         verify(viewMock).setHelpText(Constants.INSTANCE.DelegationUserInputRequired());
-        verify(lifecycleServiceMock, never())
+        verify(remoteTaskService, never())
                 .delegate(anyString(), anyString(), anyLong(), anyString());
     }
 
@@ -113,22 +108,18 @@ public class TaskAssignmentsPresenterTest {
         presenter.delegateTask(null);
 
         verify(viewMock).setHelpText(Constants.INSTANCE.DelegationUserInputRequired());
-        verify(lifecycleServiceMock, never())
+        verify(remoteTaskService, never())
                 .delegate(anyString(), anyString(), anyLong(), anyString());
     }
 
     @Test
     public void delegationDisabled_whenCompletedTaskSelected() {
         final long COMPLETED_TASK_ID = 1;
-        when(operationsServiceMock.getTaskDetails(COMPLETED_TASK_ID))
-                .thenReturn(new TaskSummary(COMPLETED_TASK_ID, null, null,
-                                "Completed"/*status*/, 0, CURRENT_USER/*actual owner*/,
-                                null, null, null, null, null, 0, 0, null, 0));
-        when(operationsServiceMock.allowDelegate(
-                eq(COMPLETED_TASK_ID),
-                eq(CURRENT_USER),
-                anySet()))
-                .thenReturn(false);
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setTaskId(COMPLETED_TASK_ID);
+        task.setStatus("Completed");
+        task.setPotOwnersString(Arrays.asList(CURRENT_USER));
+        when(remoteTaskService.getTaskAssignmentDetails(anyString(), anyString(), eq(COMPLETED_TASK_ID))).thenReturn(task);
 
         // When task in status Completed is selected
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(COMPLETED_TASK_ID));
@@ -142,15 +133,13 @@ public class TaskAssignmentsPresenterTest {
     @Test
     public void delegationDisabled_whenTaskNotOwnedByCurrentUserSelected() {
         final long TASK_OWNED_BY_SOMEONE_ELSE_ID = 2;
-        when(operationsServiceMock.getTaskDetails(TASK_OWNED_BY_SOMEONE_ELSE_ID))
-                .thenReturn(new TaskSummary(TASK_OWNED_BY_SOMEONE_ELSE_ID, null,
-                                null, "Ready"/*status*/, 0, OTHER_USER/*actual owner*/,
-                                null, null, null, null, null, 0, 0, null, 0));
-        when(operationsServiceMock.allowDelegate(
-                eq(TASK_OWNED_BY_SOMEONE_ELSE_ID),
-                eq(OTHER_USER),
-                anySet()))
-                .thenReturn(false);
+
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setTaskId(TASK_OWNED_BY_SOMEONE_ELSE_ID);
+        task.setStatus("Ready");
+        task.setActualOwner(OTHER_USER);
+        task.setPotOwnersString(Arrays.asList(OTHER_USER));
+        when(remoteTaskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_OWNED_BY_SOMEONE_ELSE_ID))).thenReturn(task);
 
         // When task not owned by Current user
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(TASK_OWNED_BY_SOMEONE_ELSE_ID));
@@ -164,15 +153,13 @@ public class TaskAssignmentsPresenterTest {
     @Test
     public void delegationEnabled_whenTaskOwnedByCurrentUserSelected() {
         final long TASK_OWNED_BY_CURRENT_USER = 3;
-        when(operationsServiceMock.getTaskDetails(TASK_OWNED_BY_CURRENT_USER))
-                .thenReturn(new TaskSummary(TASK_OWNED_BY_CURRENT_USER, null,
-                                null, "Ready"/*status*/, 0, CURRENT_USER/*actual owner*/,
-                                null, null, null, null, null, 0, 0, null, 0));
-        when(operationsServiceMock.allowDelegate(
-                eq(TASK_OWNED_BY_CURRENT_USER),
-                eq(CURRENT_USER),
-                anySet()))
-                .thenReturn(true);
+
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setTaskId(TASK_OWNED_BY_CURRENT_USER);
+        task.setStatus("Ready");
+        task.setActualOwner(CURRENT_USER);
+        task.setPotOwnersString(Arrays.asList(CURRENT_USER));
+        when(remoteTaskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_OWNED_BY_CURRENT_USER))).thenReturn(task);
 
         // When task not owned by Current user
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(TASK_OWNED_BY_CURRENT_USER));
@@ -182,6 +169,78 @@ public class TaskAssignmentsPresenterTest {
         inOrder.verify(viewMock).enableUserOrGroupInput(false);
         inOrder.verify(viewMock).enableDelegateButton(true);
         inOrder.verify(viewMock).enableUserOrGroupInput(true);
+    }
+
+    @Test
+    public void allowDelegateStatusCompleted(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setStatus("Completed");
+
+        assertFalse(presenter.isDelegateAllowed(task));
+    }
+
+    @Test
+    public void allowDelegateActualOwner(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setActualOwner(CURRENT_USER);
+
+        assertTrue(presenter.isDelegateAllowed(task));
+    }
+
+    @Test
+    public void allowDelegateActualOwnerNotCurrentUser(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setActualOwner(OTHER_USER);
+
+        assertFalse(presenter.isDelegateAllowed(task));
+    }
+
+    @Test
+    public void allowDelegateCreatedBy(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setCreatedBy(CURRENT_USER);
+
+        assertTrue(presenter.isDelegateAllowed(task));
+    }
+
+    @Test
+    public void allowDelegateCreatedByNotCurrentUser(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setCreatedBy(OTHER_USER);
+
+        assertFalse(presenter.isDelegateAllowed(task));
+    }
+
+    @Test
+    public void allowDelegatePotentialOwner(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setPotOwnersString(Arrays.asList(CURRENT_USER));
+
+        assertTrue(presenter.isDelegateAllowed(task));
+    }
+
+    @Test
+    public void allowDelegatePotentialOwnerNotCurrentUser(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setPotOwnersString(Arrays.asList(OTHER_USER));
+
+        assertFalse(presenter.isDelegateAllowed(task));
+    }
+
+    @Test
+    public void allowDelegateBusinessAdmins(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setBusinessAdmins(Arrays.asList(CURRENT_USER));
+
+        assertTrue(presenter.isDelegateAllowed(task));
+    }
+
+    @Test
+    public void allowDelegateBusinessAdminsNotCurrentUser(){
+        final TaskAssignmentSummary task = new TaskAssignmentSummary();
+        task.setBusinessAdmins(Arrays.asList(OTHER_USER));
+
+        assertFalse(presenter.isDelegateAllowed(task));
     }
 
 }

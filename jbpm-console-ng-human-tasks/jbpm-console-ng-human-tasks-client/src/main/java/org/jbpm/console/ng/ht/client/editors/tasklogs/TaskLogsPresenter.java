@@ -15,9 +15,7 @@
  */
 package org.jbpm.console.ng.ht.client.editors.tasklogs;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
@@ -27,10 +25,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jbpm.console.ng.ga.model.PortableQueryFilter;
-import org.jbpm.console.ng.ga.model.QueryFilter;
 import org.jbpm.console.ng.gc.client.util.DateUtils;
-import org.jbpm.console.ng.ht.client.i18n.Constants;
 import org.jbpm.console.ng.ht.model.TaskEventSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
@@ -52,18 +47,16 @@ public class TaskLogsPresenter {
 
     private TaskLogsView view;
 
-    private Caller<RemoteTaskService> taskAuditService;
+    private Caller<RemoteTaskService> remoteTaskService;
 
     private long currentTaskId = 0;
     private String serverTemplateId;
     private String containerId;
 
-    private Constants constants = Constants.INSTANCE;
-
     @Inject
-    public TaskLogsPresenter( final TaskLogsView view, final Caller<RemoteTaskService> taskAuditService ) {
+    public TaskLogsPresenter( final TaskLogsView view, final Caller<RemoteTaskService> remoteTaskService) {
         this.view = view;
-        this.taskAuditService = taskAuditService;
+        this.remoteTaskService = remoteTaskService;
     }
 
     @PostConstruct
@@ -76,28 +69,27 @@ public class TaskLogsPresenter {
     }
 
     public void refreshLogs() {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put( "taskId", currentTaskId );
-        QueryFilter filter = new PortableQueryFilter( 0, 0, false, "", "", false, "", params );
+        view.setLogTextAreaText("");
+        remoteTaskService.call(
+                new RemoteCallback<List<TaskEventSummary>>() {
+                    @Override
+                    public void callback(List<TaskEventSummary>events) {
+                        SafeHtmlBuilder safeHtmlBuilder = new SafeHtmlBuilder();
+                        for (TaskEventSummary tes : events) {
+                            String summaryStr = summaryToString(tes);
+                            safeHtmlBuilder.appendEscapedLines(summaryStr);
+                        }
+                        view.setLogTextAreaText(safeHtmlBuilder.toSafeHtml().asString());
+                    }
 
-        taskAuditService.call(new RemoteCallback<List<TaskEventSummary>>() {
-            @Override
-            public void callback(List<TaskEventSummary>events) {
-                SafeHtmlBuilder safeHtmlBuilder = new SafeHtmlBuilder();
-                for (TaskEventSummary tes : events) {
-                    String summaryStr = summaryToString(tes);
-                    safeHtmlBuilder.appendEscapedLines(summaryStr);
-                }
-                view.setLogTextAreaText(safeHtmlBuilder.toSafeHtml().asString());
-            }
-
-            public String summaryToString(TaskEventSummary tes) {
-                String timeStamp = DateUtils.getDateTimeStr(tes.getLogTime());
-                String additionalDetail = "UPDATED".equals(tes.getType()) ? tes.getMessage() : tes.getUserId();
-                return timeStamp + ": Task " + tes.getType() + " (" + additionalDetail + ")\n";
-            }
-        }, new DefaultErrorCallback() ).getTaskEvents( serverTemplateId, containerId, currentTaskId );
-
+                    public String summaryToString(TaskEventSummary tes) {
+                        String timeStamp = DateUtils.getDateTimeStr(tes.getLogTime());
+                        String additionalDetail = "UPDATED".equals(tes.getType()) ? tes.getMessage() : tes.getUserId();
+                        return timeStamp + ": Task " + tes.getType() + " (" + additionalDetail + ")\n";
+                    }
+                },
+                new DefaultErrorCallback()
+        ).getTaskEvents( serverTemplateId, containerId, currentTaskId );
     }
 
     public void onTaskSelectionEvent( @Observes final TaskSelectionEvent event ) {

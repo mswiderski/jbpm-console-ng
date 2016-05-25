@@ -41,7 +41,6 @@ import org.dashbuilder.dataset.sort.SortOrder;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.security.shared.api.Group;
-import org.jboss.errai.security.shared.api.identity.User;
 import org.jbpm.console.ng.df.client.filter.FilterSettings;
 import org.jbpm.console.ng.df.client.list.base.DataSetQueryHelper;
 import org.jbpm.console.ng.gc.client.dataset.AbstractDataSetReadyCallback;
@@ -91,18 +90,14 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
 
     }
 
-    @Inject
-    private DataSetTasksListGridPresenter.DataSetTaskListView view;
-
     private Constants constants = Constants.INSTANCE;
 
-    @Inject
+    private DataSetTasksListGridPresenter.DataSetTaskListView view;
+
     private Caller<RemoteTaskService> remoteTaskService;
 
-    @Inject
-    DataSetQueryHelper dataSetQueryHelper;
+    protected DataSetQueryHelper dataSetQueryHelper;
 
-    @Inject
     private DataSetQueryHelper dataSetQueryHelperDomainSpecific;
 
     @Inject
@@ -111,7 +106,6 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
     @Inject
     private Caller<SpecManagementService> specManagementService;
 
-    @Inject
     protected ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder;
 
     private String selectedServerTemplate = "";
@@ -122,7 +116,6 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
     protected RefreshSelectorMenuBuilder refreshSelectorMenuBuilder = new RefreshSelectorMenuBuilder(this);
 
     public AbstractTasksListGridPresenter() {
-
         dataProvider = new AsyncDataProvider<TaskSummary>() {
 
             @Override
@@ -133,16 +126,6 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
 
             }
         };
-    }
-
-    public AbstractTasksListGridPresenter(DataSetTasksListGridPresenter.DataSetTaskListView view,
-                                          DataSetQueryHelper dataSetQueryHelper,
-                                          DataSetQueryHelper dataSetQueryHelperDomainSpecific,
-                                          User identity) {
-        this.view = view;
-        this.dataSetQueryHelper = dataSetQueryHelper;
-        this.dataSetQueryHelperDomainSpecific = dataSetQueryHelperDomainSpecific;
-        this.identity = identity;
     }
 
     @Override
@@ -217,7 +200,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
                 }
             }
         } catch (Exception e) {
-            errorPopup.showMessage(Constants.INSTANCE.UnexpectedError(e.getMessage()));
+            errorPopup.showMessage(constants.UnexpectedError(e.getMessage()));
         }
 
     }
@@ -431,7 +414,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
                 new RemoteCallback<Void>() {
                     @Override
                     public void callback(Void nothing) {
-                        view.displayNotification(Constants.INSTANCE.TaskReleased(String.valueOf(task.getTaskId())));
+                        view.displayNotification(constants.TaskReleased(String.valueOf(task.getTaskId())));
                         refreshGrid();
                     }
                 },
@@ -445,7 +428,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
                 new RemoteCallback<Void>() {
                     @Override
                     public void callback(Void nothing) {
-                        view.displayNotification(Constants.INSTANCE.TaskClaimed(String.valueOf(task.getTaskId())));
+                        view.displayNotification(constants.TaskClaimed(String.valueOf(task.getTaskId())));
                         refreshGrid();
                     }
                 },
@@ -512,4 +495,28 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
         refreshGrid();
     }
 
+    @Inject
+    public void setView(final DataSetTaskListView view) {
+        this.view = view;
+    }
+
+    @Inject
+    public void setDataSetQueryHelper(final DataSetQueryHelper dataSetQueryHelper) {
+        this.dataSetQueryHelper = dataSetQueryHelper;
+    }
+
+    @Inject
+    public void setDataSetQueryHelperDomainSpecific(final DataSetQueryHelper dataSetQueryHelperDomainSpecific) {
+        this.dataSetQueryHelperDomainSpecific = dataSetQueryHelperDomainSpecific;
+    }
+
+    @Inject
+    public void setRemoteTaskService(final Caller<RemoteTaskService> remoteTaskService) {
+        this.remoteTaskService = remoteTaskService;
+    }
+
+    @Inject
+    public void setServerTemplateSelectorMenuBuilder(final ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder) {
+        this.serverTemplateSelectorMenuBuilder = serverTemplateSelectorMenuBuilder;
+    }
 }

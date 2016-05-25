@@ -17,8 +17,6 @@ package org.jbpm.console.ng.ht.client.editors.taskslist.grid;
 
 import javax.enterprise.context.Dependent;
 
-import org.jboss.errai.security.shared.api.identity.User;
-import org.jbpm.console.ng.df.client.list.base.DataSetQueryHelper;
 import org.jbpm.console.ng.gc.client.menu.RestoreDefaultFiltersMenuBuilder;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchScreen;
@@ -31,17 +29,6 @@ import org.uberfire.workbench.model.menu.Menus;
 public class DroolsTasksListGridPresenter extends AbstractTasksListGridPresenter {
 
     public static final String SCREEN_ID = "Drools Tasks List";
-
-    public DroolsTasksListGridPresenter() {
-        super();
-    }
-
-    public DroolsTasksListGridPresenter(final DataSetTaskListView view,
-                                        final DataSetQueryHelper dataSetQueryHelper,
-                                        final DataSetQueryHelper dataSetQueryHelperDomainSpecific,
-                                        final User identity) {
-        super(view, dataSetQueryHelper, dataSetQueryHelperDomainSpecific, identity);
-    }
 
     @WorkbenchMenu
     @Override

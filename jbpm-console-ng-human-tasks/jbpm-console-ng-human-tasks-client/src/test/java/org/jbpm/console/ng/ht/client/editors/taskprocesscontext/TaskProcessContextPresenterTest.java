@@ -125,7 +125,7 @@ public class TaskProcessContextPresenterTest {
         summary.setProcessId("processId");
         summary.setProcessName("processName");
         summary.setState(1);
-        when(dataServiceEntryPoint.getProcessInstance("", new ProcessInstanceKey("", -1l))).thenReturn(summary);
+        when(dataServiceEntryPoint.getProcessInstance(anyString(), any(ProcessInstanceKey.class))).thenReturn(summary);
 
         presenter.goToProcessInstanceDetails();
 
