@@ -185,5 +185,12 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-audit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
 </dependencies>
 </project>

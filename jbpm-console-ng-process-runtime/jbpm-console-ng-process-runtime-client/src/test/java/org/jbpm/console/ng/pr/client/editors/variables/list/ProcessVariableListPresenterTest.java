@@ -56,11 +56,13 @@ public class ProcessVariableListPresenterTest {
     public void testLoadVariableHistory() {
         final ParameterizedCommand callback = mock(ParameterizedCommand.class);
         final String variableName = "variable";
+        final String deploymentId = "deploymentId";
         final long processInstanceId = 1l;
         final ProcessVariableSummary summary = new ProcessVariableSummary(variableName, "variableInstanceId", processInstanceId, "oldValue", "newValue", System.currentTimeMillis(), "type");
         final List<ProcessVariableSummary> summaries = Arrays.asList(summary);
-//        when(dataServiceEntryPoint.getVariableHistory(processInstanceId, variableName)).thenReturn(summaries);
-        final ProcessInstanceSelectionEvent event = new ProcessInstanceSelectionEvent("deploymentId", processInstanceId, "processDefId", "processDefName", 1);
+        when(processVariablesService.getVariableHistory(anyString(), eq(deploymentId), eq(processInstanceId), eq(variableName))).thenReturn(summaries);
+
+        final ProcessInstanceSelectionEvent event = new ProcessInstanceSelectionEvent(deploymentId, processInstanceId, "processDefId", "processDefName", 1);
 
         presenter.onProcessInstanceSelectionEvent(event);
         presenter.loadVariableHistory(callback, variableName);

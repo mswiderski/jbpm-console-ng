@@ -56,7 +56,6 @@ import org.jbpm.console.ng.pr.model.events.NewProcessInstanceEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstanceSelectionEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesUpdateEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesWithDetailsRequestEvent;
-import org.jbpm.console.ng.pr.service.ProcessInstanceService;
 import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
 import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
 import org.kie.api.runtime.process.ProcessInstance;
@@ -64,7 +63,6 @@ import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.PlaceStatus;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.events.BeforeClosePlaceEvent;
@@ -110,9 +108,6 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
     private DataSetProcessInstanceWithVariablesListView view;
 
     @Inject
-    private Caller<ProcessInstanceService> processInstanceService;
-
-    @Inject
     private DataSetQueryHelper dataSetQueryHelper;
 
     @Inject
@@ -134,40 +129,12 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
     @Inject
     private Caller<RemoteRuntimeDataService> remoteRuntimeDataService;
 
-    @Inject
     private Caller<RemoteProcessService> remoteProcessService;
 
     @Inject
     private Event<ProcessInstanceSelectionEvent> processInstanceSelected;
 
     private String selectedServerTemplate = "";
-
-    public DataSetProcessInstanceWithVariablesListPresenter() {
-        super();
-    }
-
-    public DataSetProcessInstanceWithVariablesListPresenter( DataSetProcessInstanceWithVariablesListView view, DataSetQueryHelper dataSetQueryHelper,
-                                                             DataSetQueryHelper dataSetQueryHelperDomainSpecific ) {
-        this();
-        this.dataSetQueryHelper = dataSetQueryHelper;
-        this.dataSetQueryHelperDomainSpecific = dataSetQueryHelperDomainSpecific;
-        this.view = view;
-
-    }
-
-    public DataSetProcessInstanceWithVariablesListPresenter(
-            DataSetProcessInstanceWithVariablesListView view,
-            Caller<ProcessInstanceService> processInstanceService,
-            DataSetQueryHelper dataSetQueryHelper,
-            DataSetQueryHelper dataSetQueryHelperDomainSpecific,
-            PlaceManager placeManager) {
-        this();
-        this.dataSetQueryHelper = dataSetQueryHelper;
-        this.processInstanceService = processInstanceService;
-        this.dataSetQueryHelperDomainSpecific = dataSetQueryHelperDomainSpecific;
-        this.view = view;
-        this.placeManager = placeManager;
-    }
 
     public void filterGrid( FilterSettings tableSettings ) {
         dataSetQueryHelper.setCurrentTableSettings( tableSettings );
@@ -590,4 +557,8 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
         }
     }
 
+    @Inject
+    public void setRemoteProcessService(final Caller<RemoteProcessService> remoteProcessService) {
+        this.remoteProcessService = remoteProcessService;
+    }
 }

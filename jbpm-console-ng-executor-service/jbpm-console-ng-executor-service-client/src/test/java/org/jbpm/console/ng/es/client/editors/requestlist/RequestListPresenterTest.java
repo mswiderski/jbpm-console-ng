@@ -43,13 +43,13 @@ import static org.jbpm.console.ng.es.model.RequestDataSetConstants.*;
 
 @RunWith(GwtMockitoTestRunner.class)
 public class RequestListPresenterTest {
+
     private static final Long REQUESTID_ID = 1L;
 
     private CallerMock<ExecutorServiceEntryPoint> callerMockExecutorService;
 
     @Mock
     private ExecutorServiceEntryPoint executorServiceMock;
-
 
     @Mock
     private RequestListViewImpl viewMock;
@@ -85,7 +85,6 @@ public class RequestListPresenterTest {
 
         presenter = new RequestListPresenter(viewMock,
                 callerMockExecutorService,dataSetQueryHelper,requestChangedEvent);
-        
     }
 
     @Test
@@ -93,29 +92,24 @@ public class RequestListPresenterTest {
         presenter.setAddingDefaultFilters(false);
         presenter.getData(new Range(0, 5));
 
-
         verify(dataSetQueryHelper).setLastSortOrder(SortOrder.ASCENDING);
         verify(viewMock).hideBusyIndicator();
     }
 
     @Test
     public void cancelRequestTest() {
-
         presenter.cancelRequest(REQUESTID_ID);
-        verify( requestChangedEvent,
-                times( 1 ) ).fire(any(RequestChangedEvent.class));
-        verify(executorServiceMock).cancelRequest(anyString(), REQUESTID_ID);
 
+        verify(requestChangedEvent, times(1)).fire(any(RequestChangedEvent.class));
+        verify(executorServiceMock).cancelRequest(anyString(), eq(REQUESTID_ID));
     }
 
     @Test
     public void requeueRequestTest() {
-
         presenter.requeueRequest(REQUESTID_ID);
-        verify( requestChangedEvent,
-                times( 1 ) ).fire(any(RequestChangedEvent.class));
-        verify(executorServiceMock).requeueRequest(anyString(), REQUESTID_ID);
 
+        verify(requestChangedEvent, times(1)).fire(any(RequestChangedEvent.class));
+        verify(executorServiceMock).requeueRequest(anyString(), eq(REQUESTID_ID));
     }
 
     public FilterSettings createTableSettingsPrototype() {

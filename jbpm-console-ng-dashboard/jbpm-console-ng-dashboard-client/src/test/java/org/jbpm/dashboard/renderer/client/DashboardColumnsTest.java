@@ -21,6 +21,8 @@ import java.util.Set;
 
 import javax.persistence.Column;
 
+import org.jbpm.process.audit.ProcessInstanceLog;
+import org.jbpm.services.task.audit.impl.model.BAMTaskSummaryImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,24 +42,24 @@ public class DashboardColumnsTest {
 
     @Before
     public void setUp() {
-//        Field[] fields = ProcessInstanceLog.class.getDeclaredFields();
-//        for (Field field : fields) {
-//            String columnName = field.getName();
-//            Column columnAnnotation = field.getAnnotation(Column.class);
-//            if (columnAnnotation != null && columnAnnotation.name() != null && columnAnnotation.name().length() > 0) {
-//                columnName = columnAnnotation.name();
-//            }
-//            columnNamesProcessInstanceLog.add(columnName);
-//        }
-//        fields = BAMTaskSummaryImpl.class.getDeclaredFields();
-//        for (Field field : fields) {
-//            String columnName = field.getName();
-//            Column columnAnnotation = field.getAnnotation(Column.class);
-//            if (columnAnnotation != null && columnAnnotation.name() != null && columnAnnotation.name().length() > 0) {
-//                columnName = columnAnnotation.name();
-//            }
-//            columnNamesBAMTaskSummary.add(columnName);
-//        }
+        Field[] fields = ProcessInstanceLog.class.getDeclaredFields();
+        for (Field field : fields) {
+            String columnName = field.getName();
+            Column columnAnnotation = field.getAnnotation(Column.class);
+            if (columnAnnotation != null && columnAnnotation.name() != null && columnAnnotation.name().length() > 0) {
+                columnName = columnAnnotation.name();
+            }
+            columnNamesProcessInstanceLog.add(columnName);
+        }
+        fields = BAMTaskSummaryImpl.class.getDeclaredFields();
+        for (Field field : fields) {
+            String columnName = field.getName();
+            Column columnAnnotation = field.getAnnotation(Column.class);
+            if (columnAnnotation != null && columnAnnotation.name() != null && columnAnnotation.name().length() > 0) {
+                columnName = columnAnnotation.name();
+            }
+            columnNamesBAMTaskSummary.add(columnName);
+        }
     }
 
     @Test
