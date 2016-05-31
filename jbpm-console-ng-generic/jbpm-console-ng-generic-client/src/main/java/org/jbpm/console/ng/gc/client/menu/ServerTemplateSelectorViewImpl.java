@@ -71,7 +71,11 @@ public class ServerTemplateSelectorViewImpl extends Composite implements ServerT
         serverTemplateNavLink.setIcon(IconType.SERVER);
         serverTemplateNavLink.setIconFixedWidth(true);
         serverTemplateNavLink.addClickHandler(e -> {
-            if( changeCommand != null ) changeCommand.execute(serverTemplateId);
+            if( changeCommand != null ){
+                serverTemplateButton.setText(serverTemplateId);
+                serverTemplateNavLink.setIcon(IconType.CHECK);
+                changeCommand.execute(serverTemplateId);
+            }
         });
         dropDownServerTemplates.add(serverTemplateNavLink);
     }
