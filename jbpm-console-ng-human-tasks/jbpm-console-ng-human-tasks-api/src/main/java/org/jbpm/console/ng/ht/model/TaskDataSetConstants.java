@@ -38,7 +38,7 @@ public final class TaskDataSetConstants {
     public static final String COLUMN_STATUS = "status";
     public static final String COLUMN_TASK_ID = "taskId";
     public static final String COLUMN_WORK_ITEM_ID = "workItemId";
-    public static final String COLUMN_ORGANIZATIONAL_ENTITY = "id";
+    public static final String COLUMN_ORGANIZATIONAL_ENTITY = "oeid";
 
     public static final String COLUMN_TASK_VARIABLE_TASK_ID = "taskId";
     public static final String COLUMN_TASK_VARIABLE_TASK_NAME = "TASKNAME";

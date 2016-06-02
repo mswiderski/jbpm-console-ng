@@ -180,21 +180,12 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
                     remoteTaskService.call(new RemoteCallback<List<TaskSummary>>() {
                         @Override
                         public void callback(List<TaskSummary> taskSummaries) {
-
-                            PageResponse<TaskSummary> taskSummaryPageResponse = new PageResponse<TaskSummary>();
-                            taskSummaryPageResponse.setPageRowList(taskSummaries);
-                            taskSummaryPageResponse.setStartRowIndex(visibleRange.getStart());
-                            taskSummaryPageResponse.setTotalRowSize(taskSummaries.size());
-                            taskSummaryPageResponse.setTotalRowSizeExact(taskSummaries.isEmpty());
-                            if (taskSummaries.size() < visibleRange.getLength()) {
-                                taskSummaryPageResponse.setLastPage(true);
-                            } else {
-                                taskSummaryPageResponse.setLastPage(false);
+                            boolean lastPage=false;
+                            if ( taskSummaries.size() < visibleRange.getLength() ) {
+                                lastPage = true;
                             }
+                            updateDataOnCallback(taskSummaries,visibleRange.getStart(),lastPage);
 
-                            AbstractTasksListGridPresenter.this.updateDataOnCallback(taskSummaryPageResponse);
-
-                            view.hideBusyIndicator();
                         }
                     }).getActiveTasks(selectedServerTemplate, visibleRange.getStart()/visibleRange.getLength(), visibleRange.getLength());
                 }
@@ -262,22 +253,15 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
                     List<DataSetOp> ops = tableSettings.getDataSetLookup().getOperationList();
                     String filterValue = isFilteredByTaskName(ops); //Add here the check to add the domain data columns taskName?
 
+                    boolean lastPage=false;
+                    if( dataSet.getRowCount() < view.getListGrid().getPageSize()) {
+                        lastPage=true;
+                    }
 
                     if (filterValue != null) {
-                        getDomainSpecifDataForTasks(startRange, dataSet.getRowCountNonTrimmed(), filterValue, myTasksFromDataSet);
+                        getDomainSpecifDataForTasks(startRange, filterValue, myTasksFromDataSet, lastPage);
                     } else {
-                        PageResponse<TaskSummary> taskSummaryPageResponse = new PageResponse<TaskSummary>();
-                        taskSummaryPageResponse.setPageRowList(myTasksFromDataSet);
-                        taskSummaryPageResponse.setStartRowIndex(startRange);
-                        taskSummaryPageResponse.setTotalRowSize(dataSet.getRowCountNonTrimmed());
-                        taskSummaryPageResponse.setTotalRowSizeExact(true);
-                        if (startRange + dataSet.getRowCount() == dataSet.getRowCountNonTrimmed()) {
-                            taskSummaryPageResponse.setLastPage(true);
-                        } else {
-                            taskSummaryPageResponse.setLastPage(false);
-                        }
-
-                        updateDataOnCallback(taskSummaryPageResponse);
+                        updateDataOnCallback(myTasksFromDataSet,startRange,lastPage);
                     }
 
                 }
@@ -313,7 +297,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
 
     }
 
-    public void getDomainSpecifDataForTasks(final int startRange, final int rowCountNotTrimmed, String filterValue, final List<TaskSummary> myTasksFromDataSet) {
+    public void getDomainSpecifDataForTasks(final int startRange, String filterValue, final List<TaskSummary> myTasksFromDataSet, boolean lastPage) {
 
         FilterSettings variablesTableSettings = view.getVariablesTableSettings(filterValue);
         variablesTableSettings.setTablePageSize(-1);
@@ -333,11 +317,11 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
         filter.addFilterColumn(filter1);
         variablesTableSettings.getDataSetLookup().addOperation(filter);
 
-        dataSetQueryHelperDomainSpecific.lookupDataSet(0, createDataSetDomainSpecificCallback(startRange, rowCountNotTrimmed, myTasksFromDataSet, variablesTableSettings.getDataSet()));
+        dataSetQueryHelperDomainSpecific.lookupDataSet(0, createDataSetDomainSpecificCallback(startRange, myTasksFromDataSet, variablesTableSettings.getDataSet(),lastPage));
 
     }
 
-    protected DataSetReadyCallback createDataSetDomainSpecificCallback(final int startRange, final int totalRowSize, final List<TaskSummary> instances, final DataSet dataset) {
+    protected DataSetReadyCallback createDataSetDomainSpecificCallback(final int startRange, final List<TaskSummary> instances, final DataSet dataset, boolean lastPage) {
         return new AbstractDataSetReadyCallback(errorPopup, view, dataset) {
             @Override
             public void callback(DataSet dataSet) {
@@ -357,18 +341,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
                     }
                     view.addDomainSpecifColumns(view.getListGrid(), columns);
                 }
-                PageResponse<TaskSummary> taskSummaryPageResponse = new PageResponse<TaskSummary>();
-                taskSummaryPageResponse.setPageRowList(instances);
-                taskSummaryPageResponse.setStartRowIndex(startRange);
-                taskSummaryPageResponse.setTotalRowSize(totalRowSize);
-                taskSummaryPageResponse.setTotalRowSizeExact(true);
-                if (startRange + instances.size() == totalRowSize) {
-                    taskSummaryPageResponse.setLastPage(true);
-                } else {
-                    taskSummaryPageResponse.setLastPage(false);
-                }
-
-                updateDataOnCallback(taskSummaryPageResponse);
+                updateDataOnCallback(instances,startRange,lastPage);
             }
 
         };

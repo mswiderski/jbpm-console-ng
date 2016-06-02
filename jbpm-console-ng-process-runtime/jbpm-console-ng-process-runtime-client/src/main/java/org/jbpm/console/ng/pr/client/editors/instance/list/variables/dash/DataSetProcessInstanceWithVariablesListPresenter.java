@@ -189,20 +189,12 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
                     remoteRuntimeDataService.call(new RemoteCallback<List<ProcessInstanceSummary>>() {
                         @Override
                         public void callback(List<ProcessInstanceSummary> processInstanceSummaries) {
-                            PageResponse<ProcessInstanceSummary> processInstanceSummaryPageResponse = new PageResponse<ProcessInstanceSummary>();
-                            processInstanceSummaryPageResponse.setPageRowList( processInstanceSummaries );
-                            processInstanceSummaryPageResponse.setStartRowIndex( visibleRange.getStart() );
-                            processInstanceSummaryPageResponse.setTotalRowSize( processInstanceSummaries.size() );
-                            processInstanceSummaryPageResponse.setTotalRowSizeExact( processInstanceSummaries.isEmpty() );
+                            boolean lastPage=false;
                             if ( processInstanceSummaries.size() < visibleRange.getLength() ) {
-                                processInstanceSummaryPageResponse.setLastPage( true );
-                            } else {
-                                processInstanceSummaryPageResponse.setLastPage( false );
+                                lastPage = true;
                             }
+                            updateDataOnCallback(processInstanceSummaries,visibleRange.getStart(),lastPage);
 
-                            DataSetProcessInstanceWithVariablesListPresenter.this.updateDataOnCallback( processInstanceSummaryPageResponse );
-
-                            view.hideBusyIndicator();
                         }
                     }).getProcessInstances(selectedServerTemplate, statuses, visibleRange.getStart()/visibleRange.getLength(), visibleRange.getLength());
 
@@ -230,7 +222,8 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
         return filters;
     }
 
-    protected DataSetReadyCallback createDataSetDomainSpecificCallback( final int startRange, final int totalRowSize, final List<ProcessInstanceSummary> instances, final FilterSettings tableSettings ) {
+    protected DataSetReadyCallback createDataSetDomainSpecificCallback( final int startRange,
+                                                                        final FilterSettings tableSettings,boolean lastPage ) {
         return new AbstractDataSetReadyCallback( errorPopup, view, tableSettings.getDataSet() ) {
             @Override
             public void callback( DataSet dataSet ) {
@@ -240,27 +233,16 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
                     String variableName = dataSetQueryHelperDomainSpecific.getColumnStringValue( dataSet, VARIABLE_NAME, i );
                     String variableValue = dataSetQueryHelperDomainSpecific.getColumnStringValue( dataSet, VARIABLE_VALUE, i );
 
-                    for ( ProcessInstanceSummary pis : instances ) {
+                    for ( ProcessInstanceSummary pis : myProcessInstancesFromDataSet ) {
                         if ( pis.getProcessInstanceId().equals( processInstanceId ) ) {
                             pis.addDomainData( variableName, variableValue );
                             columns.add( variableName );
                         }
                     }
                 }
-                view.addDomainSpecifColumns( view.getListGrid(), columns );
+                view.addDomainSpecifColumns(view.getListGrid(), columns);
 
-                PageResponse<ProcessInstanceSummary> processInstanceSummaryPageResponse = new PageResponse<ProcessInstanceSummary>();
-                processInstanceSummaryPageResponse.setPageRowList( instances );
-                processInstanceSummaryPageResponse.setStartRowIndex( startRange );
-                processInstanceSummaryPageResponse.setTotalRowSize( totalRowSize );
-                processInstanceSummaryPageResponse.setTotalRowSizeExact( true );
-                if ( startRange + instances.size() == totalRowSize ) {
-                    processInstanceSummaryPageResponse.setLastPage( true );
-                } else {
-                    processInstanceSummaryPageResponse.setLastPage( false );
-                }
-
-                DataSetProcessInstanceWithVariablesListPresenter.this.updateDataOnCallback( processInstanceSummaryPageResponse );
+                updateDataOnCallback(myProcessInstancesFromDataSet, startRange, lastPage);
             }
 
         };
@@ -282,22 +264,15 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
                     List<DataSetOp> ops = tableSettings.getDataSetLookup().getOperationList();
                     String filterValue = isFilteredByProcessId( ops );
 
+                    boolean lastPage=false;
+                    if( dataSet.getRowCount() < view.getListGrid().getPageSize()) {
+                        lastPage=true;
+                    }
 
                     if ( filterValue != null ) {
-                        getDomainSpecifDataForProcessInstances( startRange, dataSet, filterValue, myProcessInstancesFromDataSet );
+                        getDomainSpecifDataForProcessInstances( startRange, filterValue, lastPage );
                     } else {
-                        PageResponse<ProcessInstanceSummary> processInstanceSummaryPageResponse = new PageResponse<ProcessInstanceSummary>();
-                        processInstanceSummaryPageResponse.setPageRowList( myProcessInstancesFromDataSet );
-                        processInstanceSummaryPageResponse.setStartRowIndex( startRange );
-                        processInstanceSummaryPageResponse.setTotalRowSize( dataSet.getRowCountNonTrimmed() );
-                        processInstanceSummaryPageResponse.setTotalRowSizeExact( true );
-                        if ( startRange + dataSet.getRowCount() == dataSet.getRowCountNonTrimmed() ) {
-                            processInstanceSummaryPageResponse.setLastPage( true );
-                        } else {
-                            processInstanceSummaryPageResponse.setLastPage( false );
-                        }
-
-                        DataSetProcessInstanceWithVariablesListPresenter.this.updateDataOnCallback( processInstanceSummaryPageResponse );
+                        updateDataOnCallback(myProcessInstancesFromDataSet, startRange, lastPage);
                     }
 
                 }
@@ -334,9 +309,8 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
 
     }
 
-    public void getDomainSpecifDataForProcessInstances( final int startRange, DataSet dataSet, String filterValue, final List<ProcessInstanceSummary> myProcessInstancesFromDataSet ) {
+    public void getDomainSpecifDataForProcessInstances( final int startRange, String filterValue, boolean lastPage ) {
 
-        final int rowCountNotTrimmed = dataSet.getRowCountNonTrimmed();
         FilterSettings variablesTableSettings = view.getVariablesTableSettings( filterValue );
         variablesTableSettings.setServerTemplateId( selectedServerTemplate );
         variablesTableSettings.setTablePageSize( -1 );
@@ -345,7 +319,7 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
         dataSetQueryHelperDomainSpecific.setCurrentTableSettings( variablesTableSettings );
         dataSetQueryHelperDomainSpecific.setLastOrderedColumn( PROCESS_INSTANCE_ID );
         dataSetQueryHelperDomainSpecific.setLastSortOrder( SortOrder.ASCENDING );
-        dataSetQueryHelperDomainSpecific.lookupDataSet( 0, createDataSetDomainSpecificCallback( startRange, rowCountNotTrimmed, myProcessInstancesFromDataSet, variablesTableSettings ) );
+        dataSetQueryHelperDomainSpecific.lookupDataSet( 0, createDataSetDomainSpecificCallback( startRange, variablesTableSettings,  lastPage ) );
 
     }
 

@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.enterprise.event.Event;
 
+import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.Range;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.dashbuilder.dataset.DataSet;
@@ -174,6 +175,7 @@ public abstract class AbstractTasksListGridPresenterTest {
         verify(remoteTaskService).claimTask("", TASK_DEPLOYMENT_ID, TASK_ID);
     }
 
+    @Test
     public void isFilteredByTaskNameTest() {
         final String taskName = "taskName";
         final DataSetFilter filter = new DataSetFilter();
@@ -183,6 +185,7 @@ public abstract class AbstractTasksListGridPresenterTest {
         assertEquals(taskName, filterTaskName);
     }
 
+    @Test
     public void isFilteredByTaskNameInvalidTest() {
         final String taskName = "taskName";
         final DataSetFilter filter = new DataSetFilter();

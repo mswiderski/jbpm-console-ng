@@ -71,7 +71,8 @@ public class ServerTemplateSelectorViewImpl extends Composite implements ServerT
         serverTemplateNavLink.setIcon(IconType.SERVER);
         serverTemplateNavLink.setIconFixedWidth(true);
         serverTemplateNavLink.addClickHandler(e -> {
-            if( changeCommand != null ){
+            if (changeCommand != null) {
+                unselectAllServerTeplateNavLinks();
                 serverTemplateButton.setText(serverTemplateId);
                 serverTemplateNavLink.setIcon(IconType.CHECK);
                 changeCommand.execute(serverTemplateId);
@@ -97,4 +98,9 @@ public class ServerTemplateSelectorViewImpl extends Composite implements ServerT
         changeCommand = command;
     }
 
+    private void unselectAllServerTeplateNavLinks(){
+        for(int i =0; i < dropDownServerTemplates.getWidgetCount(); i++){
+            ((AnchorListItem)dropDownServerTemplates.getWidget(i)).setIcon(IconType.SERVER);
+        }
+    }
 }

@@ -16,11 +16,16 @@
 package org.jbpm.console.ng.gc.client.list.base;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.drools.core.spi.DataProvider;
 import org.jbpm.console.ng.gc.client.list.base.events.SearchEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +48,9 @@ public class AbstractListPresenterTest {
 
     @Mock
     HasData next;
+
+    @Mock
+    AsyncDataProvider dataProviderMock;
 
     private AbstractListPresenter testListPresenter;
 
@@ -118,4 +126,35 @@ public class AbstractListPresenterTest {
         assertEquals(1, range.getLength());
         assertEquals(searchEvent.getFilter().toLowerCase(), testListPresenter.getTextSearchStr());
     }
+
+    @Test
+    public void testUpDateDataOnCallBackFirstPage() {
+        List instanceSummaries =new ArrayList<>();
+        instanceSummaries.add("item1");
+        instanceSummaries.add("item2");
+
+        int startRange = 0;
+        testListPresenter.setDataProvider(dataProviderMock);
+        testListPresenter.updateDataOnCallback(instanceSummaries, startRange, false);
+
+        verify(dataProviderMock).updateRowCount(2, false);
+        verify(dataProviderMock).updateRowData(0, instanceSummaries);
+
+    }
+
+    @Test
+    public void testUpDateDataOnCallBackMiddlePage() {
+        List instanceSummaries =new ArrayList<>();
+        instanceSummaries.add("item1");
+        instanceSummaries.add("item2");
+
+        int startRange = 10;
+        testListPresenter.setDataProvider(dataProviderMock);
+        testListPresenter.updateDataOnCallback(instanceSummaries, startRange, true);
+
+        verify(dataProviderMock).updateRowCount(startRange + instanceSummaries.size(), true);
+        verify(dataProviderMock).updateRowData(startRange, instanceSummaries);
+
+    }
+
 }

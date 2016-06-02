@@ -16,6 +16,7 @@
 package org.jbpm.console.ng.gc.client.list.base;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.enterprise.event.Observes;
 
@@ -129,6 +130,17 @@ public abstract class AbstractListPresenter<T> implements RefreshMenuBuilder.Sup
         updateRefreshTimer();
     }
 
+    public void updateDataOnCallback(List<T> instanceSummaries, int startRange, boolean lastPage){
+
+        getListView().hideBusyIndicator();
+        dataProvider.updateRowCount(instanceSummaries.size() + startRange,
+                lastPage);
+        dataProvider.updateRowData(startRange,
+                instanceSummaries);
+
+        updateRefreshTimer();
+    }
+
     public void addDataDisplay( final HasData<T> display ) {
         dataProvider.addDataDisplay(display);
     }
@@ -143,10 +155,7 @@ public abstract class AbstractListPresenter<T> implements RefreshMenuBuilder.Sup
     }
 
     public void refreshGrid() {
-        if(dataProvider.getDataDisplays().size()>0) {
-            HasData<T> next = dataProvider.getDataDisplays().iterator().next();
-            next.setVisibleRangeAndClearData( next.getVisibleRange(), true );
-        }
+        getListView().getListGrid().setVisibleRangeAndClearData(getListView().getListGrid().getVisibleRange(),true);
     }
 
     protected void onSearchEvent(@Observes SearchEvent searchEvent) {
@@ -198,4 +207,7 @@ public abstract class AbstractListPresenter<T> implements RefreshMenuBuilder.Sup
         return textSearchStr;
     }
 
+    protected void setDataProvider(AsyncDataProvider<T> dataProvider) {
+        this.dataProvider = dataProvider;
+    }
 }
