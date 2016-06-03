@@ -394,7 +394,6 @@
             </exclusions>
         </dependency>
 
-
         <!-- UberFire -->
         <dependency>
             <groupId>org.uberfire</groupId>
@@ -684,6 +683,10 @@
             <groupId>org.kie.workbench.screens</groupId>
             <artifactId>kie-wb-common-workbench-client</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.workbench.screens</groupId>
+            <artifactId>kie-wb-common-workbench-backend</artifactId>
         </dependency>
 
         <!-- Needed for the Deployment Descriptor Editor -->
