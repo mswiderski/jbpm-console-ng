@@ -65,20 +65,38 @@ public class ServerTemplateSelectorViewImpl extends Composite implements ServerT
     }
 
     @Override
+    public void selectServerTemplate(final String serverTemplateId) {
+        if (changeCommand != null) {
+            AnchorListItem anchorListItem;
+            for(Widget anchorListItemWidged : dropDownServerTemplates){
+                anchorListItem =(AnchorListItem) anchorListItemWidged;
+                if(anchorListItem.getText().equals(serverTemplateId)) {
+                    selectServerTemplate(anchorListItem);
+                }
+            }
+        }
+    }
+
+    /* Selects the last existing server template */
+    @Override
     public void addServerTemplate(final String serverTemplateId) {
         final AnchorListItem serverTemplateNavLink = GWT.create(AnchorListItem.class);
         serverTemplateNavLink.setText(serverTemplateId);
         serverTemplateNavLink.setIcon(IconType.SERVER);
         serverTemplateNavLink.setIconFixedWidth(true);
         serverTemplateNavLink.addClickHandler(e -> {
-            if (changeCommand != null) {
-                unselectAllServerTeplateNavLinks();
-                serverTemplateButton.setText(serverTemplateId);
-                serverTemplateNavLink.setIcon(IconType.CHECK);
-                changeCommand.execute(serverTemplateId);
-            }
+            selectServerTemplate(serverTemplateNavLink);
         });
         dropDownServerTemplates.add(serverTemplateNavLink);
+    }
+
+    protected void selectServerTemplate(AnchorListItem serverTemplateNavLink){
+        if (changeCommand != null) {
+            unselectAllServerTeplateNavLinks();
+            serverTemplateButton.setText(serverTemplateNavLink.getText());
+            serverTemplateNavLink.setIcon(IconType.CHECK);
+            changeCommand.execute(serverTemplateNavLink.getText());
+        }
     }
 
     @Override

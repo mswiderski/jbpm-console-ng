@@ -52,11 +52,18 @@ public class ServerTemplateSelectorMenuBuilder implements MenuFactory.CustomMenu
         specManagementService.call(new RemoteCallback<Collection<ServerTemplate>>() {
             @Override
             public void callback(final Collection<ServerTemplate> serverTemplates) {
+                String serverTemplateId = null;
                 for (ServerTemplate serverTemplate : serverTemplates) {
                     if (serverTemplate.getServerInstanceKeys() != null && !serverTemplate.getServerInstanceKeys().isEmpty()) {
                         view.addServerTemplate(serverTemplate.getId());
+                        serverTemplateId=serverTemplate.getId();
                     }
                 }
+
+                if( serverTemplates!=null && serverTemplates.size()==1 && serverTemplateId!=null ){
+                    view.selectServerTemplate( serverTemplateId );
+                }
+
             }
         }).listServerTemplates();
         view.setServerTemplateChangeHandler(e -> serverTemplateSelectedEvent.fire(new ServerTemplateSelected(e)));
@@ -105,12 +112,19 @@ public class ServerTemplateSelectorMenuBuilder implements MenuFactory.CustomMenu
 
     public interface ServerTemplateSelectorView extends IsWidget {
 
+        void selectServerTemplate(String serverTemplateId);
+
         void addServerTemplate(String serverTemplateId);
 
         void removeServerTemplate(String serverTemplateId);
 
         void setServerTemplateChangeHandler(ParameterizedCommand<String> command);
 
+    }
+
+    @Inject
+    public void setSpectManagementService(final Caller<SpecManagementService> specManagementService) {
+        this.specManagementService = specManagementService;
     }
 
 }
