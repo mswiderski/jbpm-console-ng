@@ -90,12 +90,6 @@ public class ServerTemplateSelectorMenuBuilder implements MenuFactory.CustomMenu
             public void setEnabled(boolean enabled) {
 
             }
-
-            @Override
-            public String getSignatureId() {
-                return "org.jbpm.console.ng.gc.client.list.base.ServerTemplateSelectorMenuBuilder#menuServerTemplate";
-            }
-
         };
     }
 
