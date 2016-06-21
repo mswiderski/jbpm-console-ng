@@ -48,8 +48,6 @@ import org.jbpm.console.ng.gc.client.dataset.AbstractDataSetReadyCallback;
 import org.jbpm.console.ng.gc.client.list.base.AbstractListView.ListView;
 import org.jbpm.console.ng.gc.client.list.base.AbstractScreenListPresenter;
 import org.jbpm.console.ng.gc.client.list.base.events.SearchEvent;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelected;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelectorMenuBuilder;
 import org.uberfire.ext.widgets.common.client.menu.RefreshMenuBuilder;
 import org.uberfire.ext.widgets.common.client.menu.RefreshSelectorMenuBuilder;
 import org.jbpm.console.ng.gc.client.menu.RestoreDefaultFiltersMenuBuilder;
@@ -60,7 +58,6 @@ import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.mvp.Command;
-import org.uberfire.paging.PageResponse;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.Menus;
 
@@ -105,11 +102,6 @@ public class RequestListPresenter extends AbstractScreenListPresenter<RequestSum
 
     @Inject
     private ErrorPopupPresenter errorPopup;
-
-    @Inject
-    private ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder;
-
-    private String selectedServerTemplate = "";
 
     @Inject
     private JobDetailsPopup jobDetailsPopup;
@@ -295,11 +287,6 @@ public class RequestListPresenter extends AbstractScreenListPresenter<RequestSum
     public void onUpdateRefreshInterval(boolean enableAutoRefresh, int newInterval) {
         super.onUpdateRefreshInterval(enableAutoRefresh, newInterval);
         view.saveRefreshValue(newInterval);
-    }
-
-    public void onServerTemplateSelected(@Observes final ServerTemplateSelected serverTemplateSelected ) {
-        selectedServerTemplate = serverTemplateSelected.getServerTemplateId();
-        refreshGrid();
     }
 
     public void showJobDetails(final RequestSummary job){

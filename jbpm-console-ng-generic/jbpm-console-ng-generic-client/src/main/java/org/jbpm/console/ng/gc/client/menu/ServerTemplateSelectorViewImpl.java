@@ -66,48 +66,56 @@ public class ServerTemplateSelectorViewImpl extends Composite implements ServerT
 
     @Override
     public void selectServerTemplate(final String serverTemplateId) {
-        if (changeCommand != null) {
-            AnchorListItem anchorListItem;
-            for(Widget anchorListItemWidged : dropDownServerTemplates){
-                anchorListItem =(AnchorListItem) anchorListItemWidged;
-                if(anchorListItem.getText().equals(serverTemplateId)) {
-                    selectServerTemplate(anchorListItem);
-                }
+        for (Widget widget : dropDownServerTemplates) {
+            if (widget instanceof AnchorListItem && ((AnchorListItem) widget).getText().equals(serverTemplateId)) {
+                selectServerTemplate((AnchorListItem) widget);
+                break;
             }
         }
     }
 
-    /* Selects the last existing server template */
     @Override
     public void addServerTemplate(final String serverTemplateId) {
         final AnchorListItem serverTemplateNavLink = GWT.create(AnchorListItem.class);
         serverTemplateNavLink.setText(serverTemplateId);
         serverTemplateNavLink.setIcon(IconType.SERVER);
         serverTemplateNavLink.setIconFixedWidth(true);
-        serverTemplateNavLink.addClickHandler(e -> {
-            selectServerTemplate(serverTemplateNavLink);
-        });
+        serverTemplateNavLink.addClickHandler(e -> selectServerTemplate(serverTemplateNavLink));
         dropDownServerTemplates.add(serverTemplateNavLink);
     }
 
-    protected void selectServerTemplate(AnchorListItem serverTemplateNavLink){
-        if (changeCommand != null) {
-            unselectAllServerTeplateNavLinks();
+    protected void selectServerTemplate(final AnchorListItem serverTemplateNavLink) {
+        final boolean serverChanged = serverTemplateNavLink.getText().equals(serverTemplateButton.getText()) == false;
+        unselectAllServerTemplateNavLinks();
+        serverTemplateNavLink.setActive(true);
+        if (serverChanged) {
             serverTemplateButton.setText(serverTemplateNavLink.getText());
-            serverTemplateNavLink.setIcon(IconType.CHECK);
-            changeCommand.execute(serverTemplateNavLink.getText());
+            if (changeCommand != null) {
+                changeCommand.execute(serverTemplateNavLink.getText());
+            }
         }
     }
 
     @Override
-    public void removeServerTemplate(final String serverTemplateId) {
-        Iterator<Widget> it = dropDownServerTemplates.iterator();
+    public void clearSelectedServerTemplate() {
+        serverTemplateButton.setText(constants.ServerTemplates());
+        if (changeCommand != null) {
+            changeCommand.execute(null);
+        }
+    }
 
-        while (it.hasNext()) {
-            AnchorListItem item = (AnchorListItem) it.next();
-            if (item.getText().equals(serverTemplateId)) {
-                it.remove();
-            }
+    @Override
+    public String getSelectedServerTemplate() {
+        final String serverTemplate = serverTemplateButton.getText();
+        return serverTemplate.equals(constants.ServerTemplates()) ? null : serverTemplate;
+    }
+
+    @Override
+    public void removeAllServerTemplates() {
+        final Iterator<Widget> iterator = dropDownServerTemplates.iterator();
+        while (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
         }
     }
 
@@ -116,9 +124,12 @@ public class ServerTemplateSelectorViewImpl extends Composite implements ServerT
         changeCommand = command;
     }
 
-    private void unselectAllServerTeplateNavLinks(){
-        for(int i =0; i < dropDownServerTemplates.getWidgetCount(); i++){
-            ((AnchorListItem)dropDownServerTemplates.getWidget(i)).setIcon(IconType.SERVER);
+    private void unselectAllServerTemplateNavLinks() {
+        for (Widget widget : dropDownServerTemplates) {
+            if (widget instanceof AnchorListItem) {
+                ((AnchorListItem) widget).setActive(false);
+            }
         }
     }
+
 }

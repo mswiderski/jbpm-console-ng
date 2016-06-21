@@ -46,8 +46,6 @@ import org.jbpm.console.ng.gc.client.list.base.AbstractListView.ListView;
 import org.jbpm.console.ng.gc.client.list.base.AbstractScreenListPresenter;
 import org.jbpm.console.ng.gc.client.list.base.events.SearchEvent;
 import org.jbpm.console.ng.gc.client.menu.RestoreDefaultFiltersMenuBuilder;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelected;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelectorMenuBuilder;
 import org.jbpm.console.ng.pr.client.editors.instance.signal.ProcessInstanceSignalPresenter;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
 import org.jbpm.console.ng.pr.client.perspectives.DataSetProcessInstancesWithVariablesPerspective;
@@ -70,13 +68,10 @@ import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 import org.uberfire.ext.widgets.common.client.menu.RefreshMenuBuilder;
 import org.uberfire.ext.widgets.common.client.menu.RefreshSelectorMenuBuilder;
-import org.uberfire.lifecycle.OnFocus;
 import org.uberfire.lifecycle.OnOpen;
-import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
-import org.uberfire.paging.PageResponse;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.Menus;
 
@@ -124,17 +119,12 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
     protected final List<ProcessInstanceSummary> myProcessInstancesFromDataSet = new ArrayList<ProcessInstanceSummary>();
 
     @Inject
-    private ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder;
-
-    @Inject
     private Caller<RemoteRuntimeDataService> remoteRuntimeDataService;
 
     private Caller<RemoteProcessService> remoteProcessService;
 
     @Inject
     private Event<ProcessInstanceSelectionEvent> processInstanceSelected;
-
-    private String selectedServerTemplate = "";
 
     public void filterGrid( FilterSettings tableSettings ) {
         dataSetQueryHelper.setCurrentTableSettings( tableSettings );
@@ -347,20 +337,10 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
         refreshGrid();
     }
 
-    @OnStartup
-    public void onStartup( final PlaceRequest place ) {
-        this.place = place;
-    }
-
-    @OnFocus
-    public void onFocus() {
-        refreshGrid();
-    }
-
     @OnOpen
     public void onOpen() {
         this.textSearchStr = place.getParameter(DataSetProcessInstancesWithVariablesPerspective.PROCESS_ID, "");
-        refreshGrid();
+        super.onOpen();
     }
 
     public void abortProcessInstance( String containerId, long processInstanceId ) {
@@ -484,11 +464,6 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
 
     protected  List<ProcessInstanceSummary> getDisplayedProcessInstances(){
         return  myProcessInstancesFromDataSet;
-    }
-
-    public void onServerTemplateSelected(@Observes final ServerTemplateSelected serverTemplateSelected ) {
-        selectedServerTemplate = serverTemplateSelected.getServerTemplateId();
-        refreshGrid();
     }
 
     public void signalProcessInstance(final ProcessInstanceSummary processInstance) {

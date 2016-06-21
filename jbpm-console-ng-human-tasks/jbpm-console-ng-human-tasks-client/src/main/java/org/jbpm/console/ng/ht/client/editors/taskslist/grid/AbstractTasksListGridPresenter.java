@@ -48,8 +48,6 @@ import org.jbpm.console.ng.gc.client.experimental.grid.base.ExtendedPagedTable;
 import org.jbpm.console.ng.gc.client.list.base.AbstractListView;
 import org.jbpm.console.ng.gc.client.list.base.AbstractScreenListPresenter;
 import org.jbpm.console.ng.gc.client.list.base.events.SearchEvent;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelected;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelectorMenuBuilder;
 import org.jbpm.console.ng.ht.client.editors.taskslist.grid.dash.DataSetTasksListGridPresenter;
 import org.jbpm.console.ng.ht.client.i18n.Constants;
 import org.jbpm.console.ng.ht.model.TaskSummary;
@@ -66,7 +64,6 @@ import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 import org.uberfire.ext.widgets.common.client.menu.RefreshSelectorMenuBuilder;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
-import org.uberfire.paging.PageResponse;
 import org.uberfire.workbench.model.menu.Menus;
 
 import static org.dashbuilder.dataset.filter.FilterFactory.*;
@@ -105,10 +102,6 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
 
     @Inject
     private Caller<SpecManagementService> specManagementService;
-
-    protected ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder;
-
-    private String selectedServerTemplate = "";
 
     @Inject
     private Event<TaskSelectionEvent> taskSelected;
@@ -429,11 +422,6 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
 
     public abstract Menus getMenus();
 
-    public void onServerTemplateSelected(@Observes final ServerTemplateSelected serverTemplateSelected ) {
-        selectedServerTemplate = serverTemplateSelected.getServerTemplateId();
-        refreshGrid();
-    }
-
     public void selectTask(final TaskSummary summary, final Boolean close) {
         final DefaultPlaceRequest defaultPlaceRequest = new DefaultPlaceRequest( "Task Details Multi" );
         final PlaceStatus status = placeManager.getStatus( defaultPlaceRequest );
@@ -488,8 +476,4 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
         this.remoteTaskService = remoteTaskService;
     }
 
-    @Inject
-    public void setServerTemplateSelectorMenuBuilder(final ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder) {
-        this.serverTemplateSelectorMenuBuilder = serverTemplateSelectorMenuBuilder;
-    }
 }

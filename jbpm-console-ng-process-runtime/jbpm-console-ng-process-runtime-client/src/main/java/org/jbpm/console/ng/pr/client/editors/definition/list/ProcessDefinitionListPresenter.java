@@ -31,8 +31,6 @@ import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jbpm.console.ng.ga.model.PortableQueryFilter;
 import org.jbpm.console.ng.gc.client.list.base.AbstractListView.ListView;
 import org.jbpm.console.ng.gc.client.list.base.AbstractScreenListPresenter;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelected;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelectorMenuBuilder;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
 import org.jbpm.console.ng.pr.forms.client.display.providers.StartProcessFormDisplayProviderImpl;
 import org.jbpm.console.ng.pr.forms.client.display.views.PopupFormDisplayerView;
@@ -80,17 +78,12 @@ public class ProcessDefinitionListPresenter extends AbstractScreenListPresenter<
     private Caller<RemoteRuntimeDataService> remoteRuntimeDataService;
 
     @Inject
-    private ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder;
-
-    @Inject
     private Event<ProcessInstanceSelectionEvent> processInstanceSelected;
 
     @Inject
     private Event<ProcessDefSelectionEvent> processDefSelected;
 
     private Constants constants = Constants.INSTANCE;
-
-    private String selectedServerTemplate = "";
 
     private String placeIdentifier;
 
@@ -189,11 +182,6 @@ public class ProcessDefinitionListPresenter extends AbstractScreenListPresenter<
                 .newTopLevelCustomMenu(new RefreshMenuBuilder(this))
                 .endMenu()
                 .build();
-    }
-
-    public void onServerTemplateSelected(@Observes final ServerTemplateSelected serverTemplateSelected ) {
-        selectedServerTemplate = serverTemplateSelected.getServerTemplateId();
-        refreshGrid();
     }
 
     protected void selectProcessDefinition(final ProcessSummary processSummary, final Boolean close) {

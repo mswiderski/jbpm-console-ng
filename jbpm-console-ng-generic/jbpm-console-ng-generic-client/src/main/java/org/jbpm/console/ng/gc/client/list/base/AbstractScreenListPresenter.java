@@ -16,12 +16,15 @@
 package org.jbpm.console.ng.gc.client.list.base;
 
 import org.jboss.errai.security.shared.api.identity.User;
+import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelected;
+import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelectorMenuBuilder;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.lifecycle.OnFocus;
 import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.PlaceRequest;
 
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 /**
@@ -31,18 +34,24 @@ public abstract class AbstractScreenListPresenter<T> extends AbstractListPresent
 
     protected User identity;
 
+    protected String selectedServerTemplate = "";
+
     @Inject
     protected PlaceManager placeManager;
 
     protected PlaceRequest place;
 
+    protected ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder;
+
     @OnOpen
     public void onOpen() {
+        selectedServerTemplate = serverTemplateSelectorMenuBuilder.getSelectedServerTemplate();
         refreshGrid();
     }
 
     @OnFocus
     public void onFocus() {
+        selectedServerTemplate = serverTemplateSelectorMenuBuilder.getSelectedServerTemplate();
         refreshGrid();
     }
 
@@ -54,6 +63,16 @@ public abstract class AbstractScreenListPresenter<T> extends AbstractListPresent
     @Inject
     public void setIdentity(final User identity) {
         this.identity = identity;
+    }
+
+    @Inject
+    public void setServerTemplateSelectorMenuBuilder(final ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder) {
+        this.serverTemplateSelectorMenuBuilder = serverTemplateSelectorMenuBuilder;
+    }
+
+    public void onServerTemplateSelected(@Observes final ServerTemplateSelected serverTemplateSelected ) {
+        selectedServerTemplate = serverTemplateSelected.getServerTemplateId();
+        refreshGrid();
     }
 
 }

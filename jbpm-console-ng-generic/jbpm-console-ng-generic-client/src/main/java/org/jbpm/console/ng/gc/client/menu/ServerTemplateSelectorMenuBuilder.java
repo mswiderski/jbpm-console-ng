@@ -17,25 +17,29 @@
 package org.jbpm.console.ng.gc.client.menu;
 
 import java.util.Collection;
+import java.util.Set;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.Dependent;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.common.collect.FluentIterable;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.kie.server.controller.api.model.events.ServerInstanceConnected;
 import org.kie.server.controller.api.model.events.ServerTemplateDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.workbench.common.screens.server.management.service.SpecManagementService;
+import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.impl.BaseMenuCustom;
 
-@Dependent
+@ApplicationScoped
 public class ServerTemplateSelectorMenuBuilder implements MenuFactory.CustomMenuBuilder {
 
     @Inject
@@ -49,24 +53,39 @@ public class ServerTemplateSelectorMenuBuilder implements MenuFactory.CustomMenu
 
     @PostConstruct
     public void init() {
-        specManagementService.call(new RemoteCallback<Collection<ServerTemplate>>() {
-            @Override
-            public void callback(final Collection<ServerTemplate> serverTemplates) {
-                String serverTemplateId = null;
-                for (ServerTemplate serverTemplate : serverTemplates) {
-                    if (serverTemplate.getServerInstanceKeys() != null && !serverTemplate.getServerInstanceKeys().isEmpty()) {
-                        view.addServerTemplate(serverTemplate.getId());
-                        serverTemplateId=serverTemplate.getId();
+        view.setServerTemplateChangeHandler(e -> serverTemplateSelectedEvent.fire(new ServerTemplateSelected(e)));
+        loadServerTemplates();
+    }
+
+    protected void loadServerTemplates() {
+        specManagementService.call((Collection<ServerTemplate> serverTemplates) -> {
+            view.removeAllServerTemplates();
+
+            final Set<String> ids = FluentIterable.from(serverTemplates)
+                    .filter(s -> s.getServerInstanceKeys() != null && !s.getServerInstanceKeys().isEmpty())
+                    .transform(s -> s.getId())
+                    .toSortedSet(String.CASE_INSENSITIVE_ORDER);
+
+            for (String id : ids) {
+                view.addServerTemplate(id);
+            }
+
+            if(ids.size() == 1){
+                view.selectServerTemplate(ids.iterator().next());
+            } else {
+                final String selectedServerTemplate = view.getSelectedServerTemplate();
+                if (selectedServerTemplate != null) {
+                    if (ids.contains(selectedServerTemplate)) {
+                        view.selectServerTemplate(selectedServerTemplate);
+                    } else {
+                        view.clearSelectedServerTemplate();
                     }
                 }
-
-                if( serverTemplates!=null && serverTemplates.size()==1 && serverTemplateId!=null ){
-                    view.selectServerTemplate( serverTemplateId );
-                }
-
             }
-        }).listServerTemplates();
-        view.setServerTemplateChangeHandler(e -> serverTemplateSelectedEvent.fire(new ServerTemplateSelected(e)));
+
+            view.setVisible(ids.size() > 1);
+
+        }, new DefaultErrorCallback()).listServerTemplates();
     }
 
     @Override
@@ -88,37 +107,53 @@ public class ServerTemplateSelectorMenuBuilder implements MenuFactory.CustomMenu
 
             @Override
             public void setEnabled(boolean enabled) {
-
             }
         };
     }
 
-    public void onServerTemplateDeleted(@Observes ServerTemplateDeleted serverTemplateDeleted) {
-        view.removeServerTemplate(serverTemplateDeleted.getServerTemplateId());
+    public void onServerTemplateDeleted(@Observes final ServerTemplateDeleted serverTemplateDeleted) {
+        loadServerTemplates();
     }
 
-    public void onServerTemplateUpdated(@Observes ServerTemplateUpdated serverTemplateUpdated) {
-        final ServerTemplate serverTemplate = serverTemplateUpdated.getServerTemplate();
-        if (serverTemplate.getServerInstanceKeys() == null || serverTemplate.getServerInstanceKeys().isEmpty()) {
-            view.removeServerTemplate(serverTemplate.getId());
-        }
+    public void onServerTemplateUpdated(@Observes final ServerTemplateUpdated serverTemplateUpdated) {
+        loadServerTemplates();
+    }
+
+    public void onServerInstanceConnected(@Observes final ServerInstanceConnected serverInstanceConnected) {
+        //TODO Review better way to handle this delay
+        //Before we can reload the server template, we need to ensure that dataset queries have been registered
+        //on the specific server instance
+        Scheduler.get().scheduleFixedDelay(() -> {
+            loadServerTemplates();
+            return false;
+        }, 5000);
+    }
+
+    @Inject
+    public void setSpecManagementService(final Caller<SpecManagementService> specManagementService) {
+        this.specManagementService = specManagementService;
+    }
+
+    public String getSelectedServerTemplate() {
+        return view.getSelectedServerTemplate();
     }
 
     public interface ServerTemplateSelectorView extends IsWidget {
 
         void selectServerTemplate(String serverTemplateId);
 
+        void setVisible(boolean visible);
+
+        void clearSelectedServerTemplate();
+
+        String getSelectedServerTemplate();
+
         void addServerTemplate(String serverTemplateId);
 
-        void removeServerTemplate(String serverTemplateId);
+        void removeAllServerTemplates();
 
         void setServerTemplateChangeHandler(ParameterizedCommand<String> command);
 
-    }
-
-    @Inject
-    public void setSpectManagementService(final Caller<SpecManagementService> specManagementService) {
-        this.specManagementService = specManagementService;
     }
 
 }
