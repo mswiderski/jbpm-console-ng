@@ -35,21 +35,10 @@ public class DataSetTasksListGridPresenter extends AbstractTasksListGridPresente
 
     public static final String SCREEN_ID = "DataSet Tasks List";
 
-    @Inject
-    private QuickNewTaskPopup quickNewTaskPopup;
-
     @WorkbenchMenu
     @Override
     public Menus getMenus() {
         return MenuFactory
-                .newTopLevelMenu(Constants.INSTANCE.New_Task())
-                .respondsWith(new Command() {
-                    @Override
-                    public void execute() {
-                        quickNewTaskPopup.show();
-                    }
-                })
-                .endMenu()
                 .newTopLevelCustomMenu(serverTemplateSelectorMenuBuilder).endMenu()
                 .newTopLevelCustomMenu(new RefreshMenuBuilder(this)).endMenu()
                 .newTopLevelCustomMenu(refreshSelectorMenuBuilder).endMenu()

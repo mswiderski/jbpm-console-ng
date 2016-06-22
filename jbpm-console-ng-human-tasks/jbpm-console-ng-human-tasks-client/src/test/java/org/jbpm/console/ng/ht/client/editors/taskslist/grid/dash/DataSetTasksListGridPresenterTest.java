@@ -39,7 +39,7 @@ public class DataSetTasksListGridPresenterTest extends AbstractTasksListGridPres
     public void testMenus() {
         final Menus menus = presenter.getMenus();
 
-        assertEquals(5, menus.getItems().size());
+        assertEquals(4, menus.getItems().size());
     }
 
 }
