@@ -462,6 +462,8 @@ public class QuickNewTaskPopup extends BaseModal {
             }
         }
 
+/*
+
         taskOperationsService.call( new RemoteCallback<Long>() {
             @Override
             public void callback( Long taskId ) {
@@ -479,7 +481,7 @@ public class QuickNewTaskPopup extends BaseModal {
             }
         } ).addQuickTask( taskName, priority, due, users, groups, identity.getIdentifier(), start, claim,
                           taskFormName, deploymentId, processInstanceId );
-
+*/
     }
 
     private void refreshNewTask( Long taskId,

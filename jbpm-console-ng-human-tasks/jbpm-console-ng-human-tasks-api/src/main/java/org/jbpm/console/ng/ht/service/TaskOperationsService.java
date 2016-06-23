@@ -16,36 +16,12 @@
 
 package org.jbpm.console.ng.ht.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.jboss.errai.bus.server.annotations.Remote;
-import org.jbpm.console.ng.ht.model.TaskAssignmentSummary;
-import org.jbpm.console.ng.ht.model.TaskSummary;
 
 @Remote
 public interface TaskOperationsService {
   
-  public long addQuickTask(
-                         final String taskName,
-                         int priority,
-                         Date dueDate, final List<String> users, List<String> groups, String identity, boolean start,
-                         boolean claim,String taskFormName, String deploymentId, Long processInstanceId);
-  
-  public void updateTask(long taskId, int priority, List<String> taskDescription, Date dueDate);
-  
-  TaskSummary getTaskDetails(long taskId);
-  
-  long saveContent(long taskId, Map<String, Object> values);
-  
-  boolean existInDatabase(long taskId);
-  
-  TaskAssignmentSummary getTaskAssignmentDetails(String serverTemplateId, String containerId, long taskId);
-  
   void executeReminderForTask(long taskId,String fromUser);
-
-  Boolean allowDelegate(long taskId, String userId, Set<String> groups);
 
 }

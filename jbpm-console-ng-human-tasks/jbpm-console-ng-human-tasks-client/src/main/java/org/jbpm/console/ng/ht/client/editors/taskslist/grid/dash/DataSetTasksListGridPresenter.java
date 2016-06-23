@@ -16,16 +16,12 @@
 package org.jbpm.console.ng.ht.client.editors.taskslist.grid.dash;
 
 import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
 
 import org.jbpm.console.ng.gc.client.menu.RestoreDefaultFiltersMenuBuilder;
-import org.jbpm.console.ng.ht.client.editors.quicknewtask.QuickNewTaskPopup;
 import org.jbpm.console.ng.ht.client.editors.taskslist.grid.AbstractTasksListGridPresenter;
-import org.jbpm.console.ng.ht.client.i18n.Constants;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.ext.widgets.common.client.menu.RefreshMenuBuilder;
-import org.uberfire.mvp.Command;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.Menus;
 

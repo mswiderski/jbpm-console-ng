@@ -16,79 +16,18 @@
 
 package org.jbpm.console.ng.ht.backend.server;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.ht.model.TaskAssignmentSummary;
-import org.jbpm.console.ng.ht.model.TaskSummary;
 import org.jbpm.console.ng.ht.service.TaskOperationsService;
 
 @Service
 @ApplicationScoped
 public class TaskOperationsServiceImpl implements TaskOperationsService {
 
-
-    @Override
-    public long addQuickTask(
-                         final String taskName,
-                         int priority,
-                         Date dueDate, final List<String> users, List<String> groups, String identity, boolean start,
-                         boolean claim,String taskformName,String deploymentId, Long processInstanceId){
-
-        
-        return -1;
-    }
-
-    @Override
-    public void updateTask(long taskId, int priority, List<String> taskDescription,
-            Date dueDate) {
-
-    }
-  
-  
-    @Override
-    public TaskSummary getTaskDetails(long taskId) {
-
-        return null;
-    }
-
-    @Override
-    public long saveContent(long taskId, Map<String, Object> values) {
-        return -1;
-    }
-    
-    @Override
-    public boolean existInDatabase(long taskId) {
-        return false;
-    }
-  
-    @Override
-    public TaskAssignmentSummary getTaskAssignmentDetails(String serverTemplateId, String containerId, long taskId) {
-
-        return null;
-    }
-
     @Override
    	public void executeReminderForTask(long taskId,String fromUser) {
 
    	}
-
-    /**
-     * Checks if the user is allowed to delegate the given task
-     *
-     * @param taskId
-     * @param userId
-     * @param groups
-     * @return
-     */
-    @Override
-    public Boolean allowDelegate(long taskId, final String userId, final Set<String> groups) {
-
-        return false;
-    }
 
 }
