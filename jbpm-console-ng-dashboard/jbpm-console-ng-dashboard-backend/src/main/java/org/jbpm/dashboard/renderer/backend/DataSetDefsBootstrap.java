@@ -110,7 +110,7 @@ public class DataSetDefsBootstrap {
                                 "inner join BAMTaskSummary t on (t.processInstanceId = p.processInstanceId) " +
                                 "inner join (select min(pk) as pk from BAMTaskSummary group by taskId) d on t.pk = d.pk",
                         true)
-                .label(COLUMN_PROCESS_ID)
+                .label(COLUMN_PROCESS_NAME)
                 .label(COLUMN_PROCESS_EXTERNAL_ID)
                 .label(COLUMN_TASK_ID)
                 .label(COLUMN_TASK_NAME)
