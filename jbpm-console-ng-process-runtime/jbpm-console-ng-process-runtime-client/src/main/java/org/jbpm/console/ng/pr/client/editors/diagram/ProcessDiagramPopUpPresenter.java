@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.RequiresResize;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
-import org.jbpm.console.ng.pr.service.integration.RemoteImageService;
+import org.jbpm.console.ng.pr.service.integration.RemoteProcessImageService;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchPopup;
@@ -52,7 +52,7 @@ public class ProcessDiagramPopUpPresenter extends Composite implements RequiresR
     private ProcessDiagramWidgetView designerWidget;
 
     @Inject
-    private Caller<RemoteImageService> processImageService;
+    private Caller<RemoteProcessImageService> processImageService;
 
     private FlowPanel container = new FlowPanel();
 

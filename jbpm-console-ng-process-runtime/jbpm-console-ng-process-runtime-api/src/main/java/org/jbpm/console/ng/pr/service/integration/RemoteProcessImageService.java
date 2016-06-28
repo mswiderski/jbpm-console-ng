@@ -19,7 +19,7 @@ package org.jbpm.console.ng.pr.service.integration;
 import org.jboss.errai.bus.server.annotations.Remote;
 
 @Remote
-public interface RemoteImageService {
+public interface RemoteProcessImageService {
 
     String getProcessInstanceDiagram(String serverTemplateId, String containerId, Long processInstanceId);
 
