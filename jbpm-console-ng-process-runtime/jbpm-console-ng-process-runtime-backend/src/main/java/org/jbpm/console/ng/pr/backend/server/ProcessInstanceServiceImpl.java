@@ -22,7 +22,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.bd.model.ProcessInstanceKey;
 import org.jbpm.console.ng.bd.model.ProcessInstanceSummary;
 import org.jbpm.console.ng.ga.model.QueryFilter;
 import org.jbpm.console.ng.pr.service.ProcessInstanceService;
@@ -31,9 +30,6 @@ import org.uberfire.paging.PageResponse;
 
 import static java.util.stream.Collectors.*;
 
-/**
- * @author salaboy
- */
 @Service
 @ApplicationScoped
 public class ProcessInstanceServiceImpl implements ProcessInstanceService {
@@ -92,16 +88,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 .collect(toList());
 
         return processInstancesSums;
-    }
-
-    @Override
-    public ProcessInstanceSummary getItem(ProcessInstanceKey key) {
-        return dataService.getProcessInstance(key.getServerTemplateId(), key);
-    }
-
-    @Override
-    public List<ProcessInstanceSummary> getAll(QueryFilter filter) {
-        return getProcessInstances(filter);
     }
 
 }

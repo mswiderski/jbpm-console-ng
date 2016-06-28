@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.bd.backend.server.VariableHelper;
 import org.jbpm.console.ng.bd.integration.KieServerIntegration;
-import org.jbpm.console.ng.bd.model.ProcessVariableKey;
 import org.jbpm.console.ng.bd.model.ProcessVariableSummary;
 import org.jbpm.console.ng.ga.model.QueryFilter;
 import org.jbpm.console.ng.pr.service.ProcessVariablesService;
@@ -37,9 +36,6 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.uberfire.paging.PageResponse;
 
-/**
- * @author salaboy
- */
 @Service
 @ApplicationScoped
 public class ProcessVariablesServiceImpl implements ProcessVariablesService {
@@ -114,16 +110,6 @@ public class ProcessVariablesServiceImpl implements ProcessVariablesService {
             }
         }
         return processVariablesSums;
-    }
-
-    @Override
-    public ProcessVariableSummary getItem(ProcessVariableKey key) {
-        return null;
-    }
-
-    @Override
-    public List<ProcessVariableSummary> getAll(QueryFilter filter) {
-        return getProcessVariables(filter);
     }
 
     @Override

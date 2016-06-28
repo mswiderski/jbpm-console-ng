@@ -234,19 +234,8 @@ public class ExecutorServiceEntryPointImpl implements ExecutorServiceEntryPoint 
     }
 
     @Override
-    public RequestSummary getItem(RequestKey key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
     public boolean isExecutorDisabled() {
         return executorDisabled;
     }
 
-    @Override
-    public List<RequestSummary> getAll(QueryFilter filter) {
-        return getRequests(filter);
-    }
 }

@@ -25,7 +25,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.bd.model.DocumentKey;
 import org.jbpm.console.ng.bd.model.DocumentSummary;
 import org.jbpm.console.ng.bd.model.ProcessVariableSummary;
 import org.jbpm.console.ng.ga.model.QueryFilter;
@@ -37,9 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.paging.PageResponse;
 
-/**
- * @author salaboy
- */
 @Service
 @ApplicationScoped
 public class DocumentsServiceImpl implements DocumentsService {
@@ -105,16 +101,6 @@ public class DocumentsServiceImpl implements DocumentsService {
             }
         }
         return documents;
-    }
-
-    @Override
-    public DocumentSummary getItem(DocumentKey key) {
-        return null;
-    }
-
-    @Override
-    public List<DocumentSummary> getAll(QueryFilter filter) {
-        return getDocuments(filter);
     }
 
 }
