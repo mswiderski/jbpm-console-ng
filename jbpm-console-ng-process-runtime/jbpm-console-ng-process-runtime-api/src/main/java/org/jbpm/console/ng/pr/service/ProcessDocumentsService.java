@@ -21,11 +21,7 @@ import org.jbpm.console.ng.ga.service.GenericServiceEntryPoint;
 import org.jbpm.console.ng.bd.model.DocumentKey;
 import org.jbpm.console.ng.bd.model.DocumentSummary;
 
-/**
- *
- * @author salaboy
- */
 @Remote
-public interface DocumentsService extends GenericServiceEntryPoint<DocumentKey, DocumentSummary>{
+public interface ProcessDocumentsService extends GenericServiceEntryPoint<DocumentKey, DocumentSummary>{
     
 }

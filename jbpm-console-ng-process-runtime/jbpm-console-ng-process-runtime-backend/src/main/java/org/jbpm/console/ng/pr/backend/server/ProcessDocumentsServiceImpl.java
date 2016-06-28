@@ -28,7 +28,7 @@ import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.bd.model.DocumentSummary;
 import org.jbpm.console.ng.bd.model.ProcessVariableSummary;
 import org.jbpm.console.ng.ga.model.QueryFilter;
-import org.jbpm.console.ng.pr.service.DocumentsService;
+import org.jbpm.console.ng.pr.service.ProcessDocumentsService;
 import org.jbpm.console.ng.pr.service.ProcessVariablesService;
 import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
 import org.jbpm.document.Document;
@@ -38,9 +38,9 @@ import org.uberfire.paging.PageResponse;
 
 @Service
 @ApplicationScoped
-public class DocumentsServiceImpl implements DocumentsService {
+public class ProcessDocumentsServiceImpl implements ProcessDocumentsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DocumentsServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProcessDocumentsServiceImpl.class);
 
     @Inject
     private ProcessVariablesService processVariablesService;

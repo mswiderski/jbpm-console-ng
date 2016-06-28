@@ -35,7 +35,7 @@ import org.jbpm.console.ng.gc.client.list.base.AbstractListView;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
 import org.jbpm.console.ng.bd.model.DocumentSummary;
 import org.jbpm.console.ng.pr.model.events.ProcessInstanceSelectionEvent;
-import org.jbpm.console.ng.pr.service.DocumentsService;
+import org.jbpm.console.ng.pr.service.ProcessDocumentsService;
 import org.uberfire.paging.PageResponse;
 
 @Dependent
@@ -51,7 +51,7 @@ public class ProcessDocumentListPresenter extends AbstractListPresenter<Document
     private ProcessDocumentListView view;
 
     @Inject
-    private Caller<DocumentsService> documentsServices;
+    private Caller<ProcessDocumentsService> documentsServices;
 
     private String processInstanceId;
     private String processDefId;
