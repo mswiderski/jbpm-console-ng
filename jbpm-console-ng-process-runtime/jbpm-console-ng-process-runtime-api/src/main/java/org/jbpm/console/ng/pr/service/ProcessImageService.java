@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 JBoss by Red Hat.
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-package org.jbpm.console.ng.ht.service;
+package org.jbpm.console.ng.pr.service;
 
-import java.util.Map;
 import org.jboss.errai.bus.server.annotations.Remote;
 
-
-/**
- *
- * @author salaboy
- */
 @Remote
-public interface TaskLifeCycleService{
-  
-  
-  void complete(long taskId, String user, Map<String, Object> params);
-  
-  void claim(long taskId, String user, String deploymentId);
-  
-  void start(long taskId, String user);
-  
-  void release(long taskId, String user);
-    
-  void delegate(long taskId, String userId, String targetEntityId);
-  
+public interface ProcessImageService {
+
+    String getProcessInstanceDiagram(String serverTemplateId, String containerId, Long processInstanceId);
+
+    String getProcessDiagram(String serverTemplateId, String containerId, String processId);
+
 }

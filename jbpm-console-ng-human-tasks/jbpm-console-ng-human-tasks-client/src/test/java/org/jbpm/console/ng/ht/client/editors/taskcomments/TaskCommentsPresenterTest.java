@@ -22,7 +22,7 @@ import org.jboss.errai.security.shared.api.identity.User;
 import org.jbpm.console.ng.ht.client.editors.taskcomments.TaskCommentsPresenter.TaskCommentsView;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,9 +42,9 @@ public class TaskCommentsPresenterTest {
     private static final Long COMMENT_ID = 1L;
     private static final String USR_ID = "Jan";
 
-    private CallerMock<RemoteTaskService> callerMock;
+    private CallerMock<TaskService> callerMock;
     @Mock
-    private RemoteTaskService commentsServiceMock;
+    private TaskService commentsServiceMock;
     @Mock
     private TaskCommentsView viewMock;
     @Mock
@@ -59,7 +59,7 @@ public class TaskCommentsPresenterTest {
                 .thenReturn(USR_ID);
 
         //Mock that actually calls the callbacks
-        callerMock = new CallerMock<RemoteTaskService>(commentsServiceMock);
+        callerMock = new CallerMock<TaskService>(commentsServiceMock);
 
         presenter = new TaskCommentsPresenter(viewMock, callerMock, userMock);
     }

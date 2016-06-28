@@ -1,4 +1,20 @@
-package org.jbpm.console.ng.ht.backend.server.integration;
+/*
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jbpm.console.ng.ht.backend.server;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,33 +25,28 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
+import org.jbpm.console.ng.bd.integration.AbstractKieServerService;
 import org.jbpm.console.ng.ht.model.CommentSummary;
 import org.jbpm.console.ng.ht.model.TaskAssignmentSummary;
 import org.jbpm.console.ng.ht.model.TaskEventSummary;
 import org.jbpm.console.ng.ht.model.TaskSummary;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
 @ApplicationScoped
-public class RemoteTaskServiceImpl implements RemoteTaskService {
+public class RemoteTaskServiceImpl extends AbstractKieServerService implements TaskService {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteTaskServiceImpl.class);
 
     @Inject
-    private KieServerIntegration kieServerIntegration;
-
-    @Inject
     private IdentityProvider identityProvider;
-
 
     @Override
     public List<TaskSummary> getActiveTasks(String serverTemplateId, Integer page, Integer pageSize) {
@@ -45,7 +56,7 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
             return taskSummaries;
         }
 
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         List<org.kie.server.api.model.instance.TaskSummary> tasks = client.findTasksAssignedAsPotentialOwner(identityProvider.getName(), page, pageSize);
 
@@ -60,7 +71,7 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
 
     @Override
     public TaskSummary getTask(String serverTemplateId, String containerId, Long taskId) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         TaskInstance task = client.getTaskInstance(containerId, taskId);
 
@@ -69,8 +80,7 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
 
     @Override
     public void updateTask(String serverTemplateId, String containerId, Long taskId, Integer priority, String description, Date dueDate) {
-
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
         // TODO update only when it actually changed
         client.setTaskDescription(containerId, taskId, description);
         client.setTaskPriority(containerId, taskId, priority);
@@ -79,49 +89,49 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
 
     @Override
     public void claimTask(String serverTemplateId, String containerId, Long taskId) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         client.claimTask(containerId, taskId, identityProvider.getName());
     }
 
     @Override
     public void releaseTask(String serverTemplateId, String containerId, Long taskId) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         client.releaseTask(containerId, taskId, identityProvider.getName());
     }
 
     @Override
     public void startTask(String serverTemplateId, String containerId, Long taskId) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         client.startTask(containerId, taskId, identityProvider.getName());
     }
 
     @Override
     public void completeTask(String serverTemplateId, String containerId, Long taskId, Map<String, Object> output) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         client.completeTask(containerId, taskId, identityProvider.getName(), output);
     }
 
     @Override
     public void saveTaskContent(String serverTemplateId, String containerId, Long taskId, Map<String, Object> output) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         client.saveTaskContent(containerId, taskId, output);
     }
 
     @Override
     public void addTaskComment(String serverTemplateId, String containerId, Long taskId, String text, Date addedOn) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         client.addTaskComment(containerId, taskId, text, identityProvider.getName(), addedOn);
     }
 
     @Override
     public void deleteTaskComment(String serverTemplateId, String containerId, Long taskId, Long commentId) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         client.deleteTaskComment(containerId, taskId, commentId);
     }
@@ -129,7 +139,7 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
     @Override
     public List<CommentSummary> getTaskComments(String serverTemplateId, String containerId, Long taskId) {
         List<CommentSummary> commentSummaries = new ArrayList<CommentSummary>();
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         List<TaskComment> comments = client.getTaskCommentsByTaskId(containerId, taskId);
 
@@ -145,7 +155,7 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
     @Override
     public List<TaskEventSummary> getTaskEvents(String serverTemplateId, String containerId, Long taskId) {
         List<TaskEventSummary> eventSummaries = new ArrayList<TaskEventSummary>();
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         List<TaskEventInstance> events = client.findTaskEvents(taskId, 0, 1000);
 
@@ -160,14 +170,14 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
 
     @Override
     public void delegate(String serverTemplateId, String containerId, long taskId, String entity) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         client.delegateTask(containerId, taskId, identityProvider.getName(), entity);
     }
 
     @Override
     public TaskAssignmentSummary getTaskAssignmentDetails(String serverTemplateId, String containerId, long taskId) {
-        UserTaskServicesClient client = getClient(serverTemplateId);
+        UserTaskServicesClient client = getClient(serverTemplateId, UserTaskServicesClient.class);
 
         TaskInstance task = client.getTaskInstance(containerId, taskId, false, false, true);
         TaskAssignmentSummary summary = new TaskAssignmentSummary();
@@ -181,13 +191,9 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
         return summary;
     }
 
-    protected UserTaskServicesClient getClient(String serverTemplateId) {
-        KieServicesClient client = kieServerIntegration.getServerClient(serverTemplateId);
-        if (client == null) {
-            throw new RuntimeException("No client to interact with server " + serverTemplateId);
-        }
+    @Override
+    public void executeReminderForTask(long taskId,String fromUser) {
 
-        return client.getServicesClient(UserTaskServicesClient.class);
     }
 
     protected TaskSummary build(org.kie.server.api.model.instance.TaskSummary task) {
@@ -265,4 +271,5 @@ public class RemoteTaskServiceImpl implements RemoteTaskService {
 
         return summary;
     }
+
 }

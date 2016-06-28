@@ -29,7 +29,7 @@ import org.jboss.errai.common.client.api.Caller;
 import org.jbpm.console.ng.bd.model.ProcessSummary;
 import org.jbpm.console.ng.pr.admin.client.i18n.ProcessAdminConstants;
 import org.jbpm.console.ng.pr.admin.service.ProcessAdminService;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.workbench.common.screens.server.management.service.SpecManagementService;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
@@ -58,7 +58,7 @@ public class ProcessAdminSettingsPresenter {
     private Caller<SpecManagementService> specManagementService;
 
     @Inject
-    private Caller<RemoteRuntimeDataService> remoteRuntimeDataService;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
     @PostConstruct
     public void init() {
@@ -96,7 +96,7 @@ public class ProcessAdminSettingsPresenter {
 
     public void onServerTemplateSelected(final String serverTemplateId) {
         view.clearProcessList();
-        remoteRuntimeDataService.call(
+        processRuntimeDataService.call(
                 (List<ProcessSummary> ps) -> {
                     processeSummaryMap.clear();
                     final Set<String> pid = FluentIterable.from(ps).transform(p -> {

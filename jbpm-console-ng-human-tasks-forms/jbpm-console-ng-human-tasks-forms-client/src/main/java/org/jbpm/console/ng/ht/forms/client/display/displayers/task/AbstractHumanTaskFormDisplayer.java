@@ -45,9 +45,7 @@ import org.jbpm.console.ng.ht.forms.client.display.ht.api.HumanTaskFormDisplayer
 import org.jbpm.console.ng.ht.model.TaskKey;
 import org.jbpm.console.ng.ht.model.TaskSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
-import org.jbpm.console.ng.ht.service.TaskLifeCycleService;
-import org.jbpm.console.ng.ht.service.TaskOperationsService;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.mvp.Command;
 
@@ -81,7 +79,7 @@ public abstract class AbstractHumanTaskFormDisplayer implements HumanTaskFormDis
     protected ErrorPopupPresenter errorPopup;
 
     @Inject
-    protected Caller<RemoteTaskService> taskService;
+    protected Caller<TaskService> taskService;
 
     @Inject
     protected Event<TaskRefreshedEvent> taskRefreshed;

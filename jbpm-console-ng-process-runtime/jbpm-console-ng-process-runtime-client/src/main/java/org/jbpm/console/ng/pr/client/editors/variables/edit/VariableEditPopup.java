@@ -36,7 +36,7 @@ import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesUpdateEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.pr.service.ProcessService;
 import org.uberfire.ext.widgets.common.client.common.popups.BaseModal;
 import org.uberfire.ext.widgets.common.client.common.popups.footers.GenericModalFooter;
 import org.uberfire.mvp.Command;
@@ -67,7 +67,7 @@ public class VariableEditPopup extends BaseModal {
     private Event<NotificationEvent> notification;
 
     @Inject
-    private Caller<RemoteProcessService> processService;
+    private Caller<ProcessService> processService;
 
     @Inject
     private Event<ProcessInstancesUpdateEvent> processInstancesUpdateEvent;

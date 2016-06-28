@@ -22,14 +22,14 @@ import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.pr.admin.service.ProcessAdminService;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.pr.service.ProcessService;
 
 @Service
 @ApplicationScoped
 public class ProcessAdminServiceImpl implements ProcessAdminService {
 
     @Inject
-    private RemoteProcessService processService;
+    private ProcessService processService;
 
     @Override
     public void generateMockInstances(final String serverTemplateId,

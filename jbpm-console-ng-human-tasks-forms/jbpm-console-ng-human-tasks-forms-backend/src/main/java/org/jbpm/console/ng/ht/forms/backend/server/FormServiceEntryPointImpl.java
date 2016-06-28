@@ -28,7 +28,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
+import org.jbpm.console.ng.bd.integration.AbstractKieServerService;
 import org.jbpm.console.ng.ga.forms.service.FormServiceEntryPoint;
 import org.jbpm.document.Document;
 import org.jbpm.formModeler.kie.services.form.FormManagerService;
@@ -38,7 +38,6 @@ import org.kie.internal.task.api.ContentMarshallerContext;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.client.DocumentServicesClient;
-import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UIServicesClient;
@@ -48,12 +47,9 @@ import org.slf4j.LoggerFactory;
 
 @Service
 @ApplicationScoped
-public class FormServiceEntryPointImpl implements FormServiceEntryPoint {
+public class FormServiceEntryPointImpl extends AbstractKieServerService implements FormServiceEntryPoint {
 
     private static final Logger logger = LoggerFactory.getLogger(FormServiceEntryPointImpl.class);
-
-    @Inject
-    private KieServerIntegration kieServerIntegration;
 
     @Inject
     private FormManagerService formManagerService;
@@ -83,19 +79,14 @@ public class FormServiceEntryPointImpl implements FormServiceEntryPoint {
     @Override
     public String getFormDisplayTask(String serverTemplateId, String domainId, long taskId) {
         String registrationKey = serverTemplateId + "@" + domainId + "@" + System.currentTimeMillis();
-        KieServicesClient client = kieServerIntegration.getServerClient(serverTemplateId, domainId);
 
-        if (client == null) {
-            throw new RuntimeException("No client to interact with server " + serverTemplateId);
-        }
-        DocumentServicesClient documentClient = client.getServicesClient(DocumentServicesClient.class);
+        DocumentServicesClient documentClient = getClient(serverTemplateId, domainId, DocumentServicesClient.class);
 
         // get form content
-        UIServicesClient uiServicesClient = client.getServicesClient(UIServicesClient.class);
-
+        UIServicesClient uiServicesClient = getClient(serverTemplateId, domainId, UIServicesClient.class);
 
         // get task with inputs and outputs
-        UserTaskServicesClient taskClient = client.getServicesClient(UserTaskServicesClient.class);
+        UserTaskServicesClient taskClient = getClient(serverTemplateId, domainId, UserTaskServicesClient.class);
         TaskInstance task = taskClient.getTaskInstance(domainId, taskId, true, true, false);
         if (task == null) {
             throw new RuntimeException("No task found for id " + taskId);
@@ -114,7 +105,7 @@ public class FormServiceEntryPointImpl implements FormServiceEntryPoint {
         // prepare render context
         Map<String, Object> renderContext = new HashMap<String, Object>();
         renderContext.put("task", taskInstance);
-        renderContext.put("marshallerContext", new ContentMarshallerContext(null, client.getClassLoader()));
+        renderContext.put("marshallerContext", new ContentMarshallerContext(null, getKieServicesClient(serverTemplateId, domainId).getClassLoader()));
 
 
         Map<String, Object> inputs = processData(documentClient, task.getInputData());
@@ -156,13 +147,7 @@ public class FormServiceEntryPointImpl implements FormServiceEntryPoint {
     @Override
     public String getFormDisplayProcess(String serverTemplateId, String domainId, String processId) {
 
-        KieServicesClient client = kieServerIntegration.getServerClient(serverTemplateId, domainId);
-
-        if (client == null) {
-            throw new RuntimeException("No client to interact with server " + serverTemplateId);
-        }
-
-        ProcessServicesClient processClient = client.getServicesClient(ProcessServicesClient.class);
+        ProcessServicesClient processClient = getClient(serverTemplateId, domainId, ProcessServicesClient.class);
 
         ProcessDefinition processDefinition = processClient.getProcessDefinition(domainId, processId);
 
@@ -181,9 +166,9 @@ public class FormServiceEntryPointImpl implements FormServiceEntryPoint {
         Map<String, Object> renderContext = new HashMap<String, Object>();
         renderContext.put("process", processDesc);
         renderContext.put("outputs", processData);
-        renderContext.put("marshallerContext", new ContentMarshallerContext(null, client.getClassLoader()));
+        renderContext.put("marshallerContext", new ContentMarshallerContext(null, getKieServicesClient(serverTemplateId, domainId).getClassLoader()));
 
-        UIServicesClient uiServicesClient = client.getServicesClient(UIServicesClient.class);
+        UIServicesClient uiServicesClient = getClient(serverTemplateId, domainId, UIServicesClient.class);
 
         try {
             String formContent = uiServicesClient.getProcessForm(domainId, processId);

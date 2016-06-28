@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 JBoss by Red Hat.
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.console.ng.ht.service.integration;
+package org.jbpm.console.ng.ht.service;
 
 import java.util.Date;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.jbpm.console.ng.ht.model.TaskEventSummary;
 import org.jbpm.console.ng.ht.model.TaskSummary;
 
 @Remote
-public interface RemoteTaskService {
+public interface TaskService {
 
     List<TaskSummary> getActiveTasks(String serverTemplateId, Integer page, Integer pageSize);
 
@@ -56,4 +56,7 @@ public interface RemoteTaskService {
     void delegate(String serverTemplateId, String containerId, long taskId, String entity);
 
     TaskAssignmentSummary getTaskAssignmentDetails(String serverTemplateId, String containerId, long taskId);
+
+    void executeReminderForTask(long taskId,String fromUser);
+
 }

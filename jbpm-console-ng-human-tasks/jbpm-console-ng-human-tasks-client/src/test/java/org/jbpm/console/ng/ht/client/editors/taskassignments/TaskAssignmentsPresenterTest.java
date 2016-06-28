@@ -25,7 +25,7 @@ import org.jbpm.console.ng.ht.client.i18n.Constants;
 import org.jbpm.console.ng.ht.model.TaskAssignmentSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,9 +54,9 @@ public class TaskAssignmentsPresenterTest {
     private User userMock;
 
     @Mock
-    private RemoteTaskService remoteTaskService;
+    private TaskService taskService;
 
-    private Caller<RemoteTaskService> remoteTaskServiceCaller;
+    private Caller<TaskService> remoteTaskServiceCaller;
 
     //Thing under test
     private TaskAssignmentsPresenter presenter;
@@ -65,7 +65,7 @@ public class TaskAssignmentsPresenterTest {
     public void initMocks() {
         when(userMock.getIdentifier()).thenReturn(CURRENT_USER);
 
-        remoteTaskServiceCaller = new CallerMock<RemoteTaskService>(remoteTaskService);
+        remoteTaskServiceCaller = new CallerMock<TaskService>(taskService);
         final Event<TaskRefreshedEvent> taskRefreshed = spy(new EventSourceMock<TaskRefreshedEvent>());
         doNothing().when(taskRefreshed).fire(any(TaskRefreshedEvent.class));
 
@@ -85,7 +85,7 @@ public class TaskAssignmentsPresenterTest {
         task.setTaskId(TASK_ID);
         task.setStatus("InProgress");
         task.setPotOwnersString(Arrays.asList(CURRENT_USER));
-        when(remoteTaskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_ID))).thenReturn(task);
+        when(taskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_ID))).thenReturn(task);
 
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(1L));
         presenter.delegateTask(OTHER_USER);
@@ -99,7 +99,7 @@ public class TaskAssignmentsPresenterTest {
         presenter.delegateTask("");
 
         verify(viewMock).setHelpText(Constants.INSTANCE.DelegationUserInputRequired());
-        verify(remoteTaskService, never())
+        verify(taskService, never())
                 .delegate(anyString(), anyString(), anyLong(), anyString());
     }
 
@@ -108,7 +108,7 @@ public class TaskAssignmentsPresenterTest {
         presenter.delegateTask(null);
 
         verify(viewMock).setHelpText(Constants.INSTANCE.DelegationUserInputRequired());
-        verify(remoteTaskService, never())
+        verify(taskService, never())
                 .delegate(anyString(), anyString(), anyLong(), anyString());
     }
 
@@ -119,7 +119,7 @@ public class TaskAssignmentsPresenterTest {
         task.setTaskId(COMPLETED_TASK_ID);
         task.setStatus("Completed");
         task.setPotOwnersString(Arrays.asList(CURRENT_USER));
-        when(remoteTaskService.getTaskAssignmentDetails(anyString(), anyString(), eq(COMPLETED_TASK_ID))).thenReturn(task);
+        when(taskService.getTaskAssignmentDetails(anyString(), anyString(), eq(COMPLETED_TASK_ID))).thenReturn(task);
 
         // When task in status Completed is selected
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(COMPLETED_TASK_ID));
@@ -139,7 +139,7 @@ public class TaskAssignmentsPresenterTest {
         task.setStatus("Ready");
         task.setActualOwner(OTHER_USER);
         task.setPotOwnersString(Arrays.asList(OTHER_USER));
-        when(remoteTaskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_OWNED_BY_SOMEONE_ELSE_ID))).thenReturn(task);
+        when(taskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_OWNED_BY_SOMEONE_ELSE_ID))).thenReturn(task);
 
         // When task not owned by Current user
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(TASK_OWNED_BY_SOMEONE_ELSE_ID));
@@ -159,7 +159,7 @@ public class TaskAssignmentsPresenterTest {
         task.setStatus("Ready");
         task.setActualOwner(CURRENT_USER);
         task.setPotOwnersString(Arrays.asList(CURRENT_USER));
-        when(remoteTaskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_OWNED_BY_CURRENT_USER))).thenReturn(task);
+        when(taskService.getTaskAssignmentDetails(anyString(), anyString(), eq(TASK_OWNED_BY_CURRENT_USER))).thenReturn(task);
 
         // When task not owned by Current user
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(TASK_OWNED_BY_CURRENT_USER));

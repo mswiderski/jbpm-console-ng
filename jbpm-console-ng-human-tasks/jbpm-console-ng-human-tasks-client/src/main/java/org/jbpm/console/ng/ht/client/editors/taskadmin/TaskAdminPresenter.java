@@ -34,9 +34,7 @@ import org.jbpm.console.ng.ht.client.i18n.Constants;
 import org.jbpm.console.ng.ht.model.TaskAssignmentSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.TaskLifeCycleService;
-import org.jbpm.console.ng.ht.service.TaskOperationsService;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 
 @Dependent
@@ -68,10 +66,7 @@ public class TaskAdminPresenter {
     private User identity;
 
     @Inject
-    protected Caller<RemoteTaskService> taskServices;
-
-    @Inject
-    protected Caller<TaskOperationsService> taskOperationsServices;
+    protected Caller<TaskService> taskService;
 
     private long currentTaskId = 0;
     private String serverTemplateId;
@@ -90,7 +85,7 @@ public class TaskAdminPresenter {
     }
 
     public void forwardTask(String entity) {
-        taskServices.call(
+        taskService.call(
                 new RemoteCallback<Void>() {
                     @Override
                     public void callback(Void nothing) {
@@ -105,7 +100,7 @@ public class TaskAdminPresenter {
     }
 
     public void reminder() {
-        taskOperationsServices.call(
+        taskService.call(
                 new RemoteCallback<TaskAssignmentSummary>() {
                     @Override
                     public void callback(TaskAssignmentSummary ts) {
@@ -120,7 +115,7 @@ public class TaskAdminPresenter {
         List<Long> taskIds = new ArrayList<Long>(1);
         taskIds.add(currentTaskId);
 
-        taskServices.call(
+        taskService.call(
                 new RemoteCallback<TaskAssignmentSummary>() {
                     @Override
                     public void callback(TaskAssignmentSummary ts) {

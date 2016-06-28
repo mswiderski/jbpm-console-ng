@@ -34,7 +34,7 @@ import org.jbpm.console.ng.ht.client.i18n.Constants;
 import org.jbpm.console.ng.ht.model.TaskAssignmentSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 
 @Dependent
@@ -62,7 +62,7 @@ public class TaskAssignmentsPresenter {
     private Constants constants = Constants.INSTANCE;
     private TaskAssignmentsView view;
     private User identity;
-    private Caller<RemoteTaskService> remoteTaskService;
+    private Caller<TaskService> taskService;
     private Event<TaskRefreshedEvent> taskRefreshed;
     private long currentTaskId = 0;
     private String serverTemplateId;
@@ -72,12 +72,12 @@ public class TaskAssignmentsPresenter {
     public TaskAssignmentsPresenter(
             TaskAssignmentsView view,
             User identity,
-            Caller<RemoteTaskService> remoteTaskService,
+            Caller<TaskService> taskService,
             Event<TaskRefreshedEvent> taskRefreshed
     ) {
         this.view = view;
         this.identity = identity;
-        this.remoteTaskService = remoteTaskService;
+        this.taskService = taskService;
         this.taskRefreshed = taskRefreshed;
     }
 
@@ -95,7 +95,7 @@ public class TaskAssignmentsPresenter {
             view.setHelpText(constants.DelegationUserInputRequired());
             return;
         }
-        remoteTaskService.call(
+        taskService.call(
                 new RemoteCallback<Void>() {
                     @Override
                     public void callback(Void nothing) {
@@ -124,7 +124,7 @@ public class TaskAssignmentsPresenter {
             view.enableUserOrGroupInput(false);
             view.setPotentialOwnersInfo("");
 
-            remoteTaskService.call(new RemoteCallback<TaskAssignmentSummary>() {
+            taskService.call(new RemoteCallback<TaskAssignmentSummary>() {
                 @Override
                 public void callback(final TaskAssignmentSummary response) {
                     if (response.getPotOwnersString() == null || response.getPotOwnersString().isEmpty()) {

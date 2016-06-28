@@ -32,7 +32,7 @@ import org.jbpm.console.ng.ht.client.i18n.Constants;
 import org.jbpm.console.ng.ht.model.CommentSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 
@@ -50,7 +50,7 @@ public class TaskCommentsPresenter {
 
     private Constants constants = Constants.INSTANCE;
     private final TaskCommentsView view;
-    private final Caller<RemoteTaskService> taskCommentsServices;
+    private final Caller<TaskService> taskService;
     private final User identity;
     private final ListDataProvider<CommentSummary> dataProvider = new ListDataProvider<CommentSummary>();
     private long currentTaskId = 0;
@@ -58,9 +58,9 @@ public class TaskCommentsPresenter {
     private String containerId;
 
     @Inject
-    public TaskCommentsPresenter(TaskCommentsView view, Caller<RemoteTaskService> taskCommentsServices, User identity) {
+    public TaskCommentsPresenter(TaskCommentsView view, Caller<TaskService> taskService, User identity) {
         this.view = view;
-        this.taskCommentsServices = taskCommentsServices;
+        this.taskService = taskService;
         this.identity = identity;
     }
 
@@ -78,7 +78,7 @@ public class TaskCommentsPresenter {
     }
 
     public void refreshComments() {
-        taskCommentsServices.call(
+        taskService.call(
                 new RemoteCallback<List<CommentSummary>>() {
                     @Override
                     public void callback(List<CommentSummary> comments) {
@@ -100,7 +100,7 @@ public class TaskCommentsPresenter {
     }
 
     private void addTaskComment(final String text, final Date addedOn) {
-        taskCommentsServices.call(
+        taskService.call(
                 new RemoteCallback<Void>() {
                     @Override
                     public void callback(Void response) {
@@ -113,7 +113,7 @@ public class TaskCommentsPresenter {
     }
 
     public void removeTaskComment(long commentId) {
-        taskCommentsServices.call(
+        taskService.call(
                 new RemoteCallback<Void>() {
                     @Override
                     public void callback(Void response) {

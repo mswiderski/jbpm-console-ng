@@ -54,7 +54,7 @@ import org.jbpm.console.ng.ht.model.TaskSummary;
 import org.jbpm.console.ng.ht.model.events.NewTaskEvent;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.kie.workbench.common.screens.server.management.service.SpecManagementService;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
@@ -91,7 +91,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
 
     private DataSetTasksListGridPresenter.DataSetTaskListView view;
 
-    private Caller<RemoteTaskService> remoteTaskService;
+    private Caller<TaskService> taskService;
 
     protected DataSetQueryHelper dataSetQueryHelper;
 
@@ -170,7 +170,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
                     dataSetQueryHelper.setDataSetHandler(currentTableSettings);
                     dataSetQueryHelper.lookupDataSet(visibleRange.getStart(), createDataSetTaskCallback(visibleRange.getStart(), currentTableSettings));
                 } else {
-                    remoteTaskService.call(new RemoteCallback<List<TaskSummary>>() {
+                    taskService.call(new RemoteCallback<List<TaskSummary>>() {
                         @Override
                         public void callback(List<TaskSummary> taskSummaries) {
                             boolean lastPage=false;
@@ -376,7 +376,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
     }
 
     public void releaseTask(final TaskSummary task) {
-        remoteTaskService.call(
+        taskService.call(
                 new RemoteCallback<Void>() {
                     @Override
                     public void callback(Void nothing) {
@@ -390,7 +390,7 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
     }
 
     public void claimTask(final TaskSummary task) {
-        remoteTaskService.call(
+        taskService.call(
                 new RemoteCallback<Void>() {
                     @Override
                     public void callback(Void nothing) {
@@ -472,8 +472,8 @@ public abstract class AbstractTasksListGridPresenter extends AbstractScreenListP
     }
 
     @Inject
-    public void setRemoteTaskService(final Caller<RemoteTaskService> remoteTaskService) {
-        this.remoteTaskService = remoteTaskService;
+    public void setTaskService(final Caller<TaskService> taskService) {
+        this.taskService = taskService;
     }
 
 }

@@ -45,7 +45,7 @@ import org.jbpm.console.ng.gc.forms.client.display.displayers.util.JSNIHelper;
 import org.jbpm.console.ng.pr.forms.client.display.process.api.StartProcessFormDisplayer;
 import org.jbpm.console.ng.pr.forms.client.i18n.Constants;
 import org.jbpm.console.ng.pr.model.events.NewProcessInstanceEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.pr.service.ProcessService;
 import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.mvp.Command;
 import org.uberfire.workbench.events.NotificationEvent;
@@ -83,7 +83,7 @@ public abstract class AbstractStartProcessFormDisplayer implements StartProcessF
     @Inject
     protected Event<NewProcessInstanceEvent> newProcessInstanceEvent;
 
-    protected Caller<RemoteProcessService> processService;
+    protected Caller<ProcessService> processService;
 
     @Inject
     protected JSNIHelper jsniHelper;
@@ -268,7 +268,7 @@ public abstract class AbstractStartProcessFormDisplayer implements StartProcessF
     }
 
     @Inject
-    public void setProcessService(Caller<RemoteProcessService> processService) {
+    public void setProcessService(Caller<ProcessService> processService) {
         this.processService = processService;
     }
 }

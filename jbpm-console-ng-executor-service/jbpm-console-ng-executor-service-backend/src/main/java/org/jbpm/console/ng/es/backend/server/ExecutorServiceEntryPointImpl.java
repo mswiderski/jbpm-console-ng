@@ -23,10 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
+import org.jbpm.console.ng.bd.integration.AbstractKieServerService;
 import org.jbpm.console.ng.es.model.ErrorSummary;
 import org.jbpm.console.ng.es.model.RequestDetails;
 import org.jbpm.console.ng.es.model.RequestKey;
@@ -41,35 +40,21 @@ import org.kie.api.runtime.query.QueryContext;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.client.JobServicesClient;
-import org.kie.server.client.KieServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.paging.PageResponse;
 
 @Service
 @ApplicationScoped
-public class ExecutorServiceEntryPointImpl implements ExecutorServiceEntryPoint ,GenericServiceEntryPoint<RequestKey, RequestSummary> {
+public class ExecutorServiceEntryPointImpl extends AbstractKieServerService implements ExecutorServiceEntryPoint ,GenericServiceEntryPoint<RequestKey, RequestSummary> {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceEntryPointImpl.class);
 
     private boolean executorDisabled = false;
 
-    @Inject
-    private KieServerIntegration kieServerIntegration;
-
-
-    protected JobServicesClient getJobClient(String serverTemplateId) {
-        KieServicesClient kieServicesClient = kieServerIntegration.getServerClient(serverTemplateId);
-        if (kieServicesClient == null) {
-            throw new RuntimeException("No client to interact with kie server " + serverTemplateId);
-        }
-
-        return kieServicesClient.getServicesClient(JobServicesClient.class);
-    }
-
     @Override
     public RequestDetails getRequestDetails(String serverTemplateId, Long requestId) {
-        JobServicesClient jobClient = getJobClient(serverTemplateId);
+        JobServicesClient jobClient = getClient(serverTemplateId, JobServicesClient.class);
 
         RequestInfoInstance request = jobClient.getRequestById(requestId, true, true);
 
@@ -81,8 +66,7 @@ public class ExecutorServiceEntryPointImpl implements ExecutorServiceEntryPoint 
 
     @Override
     public Long scheduleRequest(String serverTemplateId, String commandName, Map<String, String> ctx) {
-
-        JobServicesClient jobClient = getJobClient(serverTemplateId);
+        JobServicesClient jobClient = getClient(serverTemplateId, JobServicesClient.class);
         HashMap<String, Object> data = new HashMap<>();
         if (ctx != null && !ctx.isEmpty()) {
             data = new HashMap<String, Object>(ctx);
@@ -98,8 +82,7 @@ public class ExecutorServiceEntryPointImpl implements ExecutorServiceEntryPoint 
 
     @Override
     public Long scheduleRequest(String serverTemplateId, String commandName, Date date, Map<String, String> ctx) {
-
-        JobServicesClient jobClient = getJobClient(serverTemplateId);
+        JobServicesClient jobClient = getClient(serverTemplateId, JobServicesClient.class);
         HashMap<String, Object> data = new HashMap<>();
         if (ctx != null && !ctx.isEmpty()) {
             data = new HashMap<String, Object>(ctx);
@@ -114,13 +97,13 @@ public class ExecutorServiceEntryPointImpl implements ExecutorServiceEntryPoint 
 
     @Override
     public void cancelRequest(String serverTemplateId, Long requestId) {
-        JobServicesClient jobClient = getJobClient(serverTemplateId);
+        JobServicesClient jobClient = getClient(serverTemplateId, JobServicesClient.class);
         jobClient.cancelRequest(requestId);
     }
 
     @Override
     public void requeueRequest(String serverTemplateId, Long requestId) {
-        JobServicesClient jobClient = getJobClient(serverTemplateId);
+        JobServicesClient jobClient = getClient(serverTemplateId, JobServicesClient.class);
         jobClient.requeueRequest(requestId);
     }
 
@@ -173,7 +156,6 @@ public class ExecutorServiceEntryPointImpl implements ExecutorServiceEntryPoint 
 
     }
 
-
     @Override
     public PageResponse<RequestSummary> getData(QueryFilter filter) {
         PageResponse<RequestSummary> response = new PageResponse<RequestSummary>();
@@ -217,7 +199,7 @@ public class ExecutorServiceEntryPointImpl implements ExecutorServiceEntryPoint 
             states.add(STATUS.CANCELLED.toString());
         }
 
-        JobServicesClient jobClient = getJobClient((String)filter.getParams().get("serverTemplateId"));
+        JobServicesClient jobClient = getClient((String)filter.getParams().get("serverTemplateId"), JobServicesClient.class);
         List<RequestInfoInstance> jobs = jobClient.getRequestsByStatus(states, 0, 100);
 
 

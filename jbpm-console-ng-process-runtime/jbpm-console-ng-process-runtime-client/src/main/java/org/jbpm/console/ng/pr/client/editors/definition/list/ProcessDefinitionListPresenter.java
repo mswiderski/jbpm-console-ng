@@ -40,8 +40,7 @@ import org.jbpm.console.ng.bd.model.ProcessSummary;
 import org.jbpm.console.ng.pr.model.events.NewProcessInstanceEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessDefSelectionEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstanceSelectionEvent;
-import org.jbpm.console.ng.pr.service.ProcessDefinitionService;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
@@ -72,10 +71,7 @@ public class ProcessDefinitionListPresenter extends AbstractScreenListPresenter<
     private ProcessDefinitionListView view;
 
     @Inject
-    private Caller<ProcessDefinitionService> processDefinitionService;
-
-    @Inject
-    private Caller<RemoteRuntimeDataService> remoteRuntimeDataService;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
     @Inject
     private Event<ProcessInstanceSelectionEvent> processInstanceSelected;
@@ -144,7 +140,7 @@ public class ProcessDefinitionListPresenter extends AbstractScreenListPresenter<
         currentFilter.setIsAscending((columnSortList.size() > 0) ? columnSortList.get(0)
                 .isAscending() : true);
 
-        remoteRuntimeDataService.call( new RemoteCallback<List<ProcessSummary>>() {
+        processRuntimeDataService.call(new RemoteCallback<List<ProcessSummary>>() {
             @Override
             public void callback( List<ProcessSummary> processDefsSums ) {
 

@@ -31,7 +31,7 @@ import org.jbpm.console.ng.bd.model.ProcessSummary;
 import org.jbpm.console.ng.bd.model.TaskDefSummary;
 import org.jbpm.console.ng.pr.client.editors.definition.details.BaseProcessDefDetailsPresenter;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.uberfire.backend.vfs.VFSService;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 
@@ -62,7 +62,7 @@ public class AdvancedViewProcessDefDetailsPresenter extends
     private AdvancedProcessDefDetailsView view;
 
     @Inject
-    private Caller<RemoteRuntimeDataService> processDefService;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
     @Inject
     private Caller<VFSService> fileServices;
@@ -176,7 +176,7 @@ public class AdvancedViewProcessDefDetailsPresenter extends
         view.getNroOfHumanTasksText().setText( "" );
         view.getHumanTasksListBox().setText( "" );
 
-        processDefService.call(new RemoteCallback<List<TaskDefSummary>>() {
+        processRuntimeDataService.call(new RemoteCallback<List<TaskDefSummary>>() {
 
             @Override
             public void callback(final List<TaskDefSummary> userTaskSummaries) {
@@ -204,7 +204,7 @@ public class AdvancedViewProcessDefDetailsPresenter extends
     @Override
     protected void refreshProcessDef( final String serverTemplateId, final String deploymentId, final String processId ) {
 
-        processDefService.call( new RemoteCallback<ProcessSummary>() {
+        processRuntimeDataService.call(new RemoteCallback<ProcessSummary>() {
 
             @Override
             public void callback( ProcessSummary process ) {

@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 JBoss by Red Hat.
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,50 +14,43 @@
  * limitations under the License.
  */
 
-package org.jbpm.console.ng.pr.backend.server.integration;
+package org.jbpm.console.ng.pr.backend.server;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
-import org.jbpm.console.ng.pr.backend.server.integration.model.RemoteCorrelationKey;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.bd.integration.AbstractKieServerService;
+import org.jbpm.console.ng.pr.backend.server.model.RemoteCorrelationKey;
+import org.jbpm.console.ng.pr.service.ProcessService;
 import org.kie.internal.process.CorrelationKey;
-import org.kie.server.client.DocumentServicesClient;
-import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
 @ApplicationScoped
-public class RemoteProcessServiceImpl implements RemoteProcessService {
+public class RemoteProcessServiceImpl extends AbstractKieServerService implements ProcessService {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteProcessServiceImpl.class);
 
-    @Inject
-    private KieServerIntegration kieServerIntegration;
-
     @Override
     public void abortProcessInstance(String serverTemplateId, String containerId, Long processInstanceId) {
-        ProcessServicesClient client = getClient(serverTemplateId, containerId);
+        ProcessServicesClient client = getClient(serverTemplateId, containerId, ProcessServicesClient.class);
 
         client.abortProcessInstance(containerId, processInstanceId);
     }
 
     @Override
     public void abortProcessInstances(String serverTemplateId, List<String> containers, List<Long> processInstanceId) {
-
         if (new HashSet<String>(containers).size() == 1) {
-            ProcessServicesClient client = getClient(serverTemplateId, containers.get(0));
+            ProcessServicesClient client = getClient(serverTemplateId, containers.get(0), ProcessServicesClient.class);
             client.abortProcessInstances(containers.get(0), processInstanceId);
         } else {
             for (int i = 0; i < processInstanceId.size(); i++) {
-                ProcessServicesClient client = getClient(serverTemplateId, containers.get(i));
+                ProcessServicesClient client = getClient(serverTemplateId, containers.get(i), ProcessServicesClient.class);
                 client.abortProcessInstance(containers.get(i), processInstanceId.get(i));
             }
         }
@@ -65,7 +58,7 @@ public class RemoteProcessServiceImpl implements RemoteProcessService {
 
     @Override
     public Long startProcess(String serverTemplateId, String containerId, String processId, String correlationKey, Map<String, Object> params) {
-        ProcessServicesClient client = getClient(serverTemplateId, containerId);
+        ProcessServicesClient client = getClient(serverTemplateId, containerId, ProcessServicesClient.class);
 
         if (correlationKey != null && !correlationKey.isEmpty()) {
 
@@ -80,14 +73,14 @@ public class RemoteProcessServiceImpl implements RemoteProcessService {
 
     @Override
     public List<String> getAvailableSignals(String serverTemplateId, String containerId, Long processInstanceId) {
-        ProcessServicesClient client = getClient(serverTemplateId, containerId);
+        ProcessServicesClient client = getClient(serverTemplateId, containerId, ProcessServicesClient.class);
 
         return client.getAvailableSignals(containerId, processInstanceId);
     }
 
     @Override
     public void signalProcessInstance(String serverTemplateId, String containerId, Long processInstanceId, String signal, Object event) {
-        ProcessServicesClient client = getClient(serverTemplateId, containerId);
+        ProcessServicesClient client = getClient(serverTemplateId, containerId, ProcessServicesClient.class);
 
         client.signalProcessInstance(containerId, processInstanceId, signal, event);
     }
@@ -95,11 +88,11 @@ public class RemoteProcessServiceImpl implements RemoteProcessService {
     @Override
     public void signalProcessInstances(String serverTemplateId, List<String> containers, List<Long> processInstanceId, String signal, Object event) {
         if (new HashSet<String>(containers).size() == 1) {
-            ProcessServicesClient client = getClient(serverTemplateId, containers.get(0));
+            ProcessServicesClient client = getClient(serverTemplateId, containers.get(0), ProcessServicesClient.class);
             client.signalProcessInstances(containers.get(0), processInstanceId, signal, event);
         } else {
             for (int i = 0; i < processInstanceId.size(); i++) {
-                ProcessServicesClient client = getClient(serverTemplateId, containers.get(i));
+                ProcessServicesClient client = getClient(serverTemplateId, containers.get(i), ProcessServicesClient.class);
                 client.signalProcessInstance(containers.get(i), processInstanceId.get(i), signal, event);
             }
         }
@@ -107,24 +100,9 @@ public class RemoteProcessServiceImpl implements RemoteProcessService {
 
     @Override
     public void setProcessVariable(String serverTemplateId, String containerId, long processInstanceId, String variableName, String value) {
-        ProcessServicesClient client = getClient(serverTemplateId, containerId);
+        ProcessServicesClient client = getClient(serverTemplateId, containerId, ProcessServicesClient.class);
 
         client.setProcessVariable(containerId, processInstanceId, variableName, value);
     }
 
-    @Override
-    public String getDocumentLink(String serverTemplateId, String documentIdentifier) {
-
-        DocumentServicesClient documentClient = kieServerIntegration.getServerClient(serverTemplateId).getServicesClient(DocumentServicesClient.class);
-        return documentClient.getDocumentLink(documentIdentifier);
-    }
-
-    protected ProcessServicesClient getClient(String serverTemplateId, String containerId) {
-        KieServicesClient client = kieServerIntegration.getServerClient(serverTemplateId, containerId);
-        if (client == null) {
-            throw new RuntimeException("No client to interact with server " + serverTemplateId);
-        }
-
-        return client.getServicesClient(ProcessServicesClient.class);
-    }
 }

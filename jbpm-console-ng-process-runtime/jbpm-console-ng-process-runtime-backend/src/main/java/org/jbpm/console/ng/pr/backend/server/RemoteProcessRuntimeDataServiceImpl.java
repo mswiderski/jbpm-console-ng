@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 JBoss by Red Hat.
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.jbpm.console.ng.pr.backend.server.integration;
+package org.jbpm.console.ng.pr.backend.server;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
+import org.jbpm.console.ng.bd.integration.AbstractKieServerService;
 import org.jbpm.console.ng.bd.model.NodeInstanceSummary;
 import org.jbpm.console.ng.bd.model.ProcessDefinitionKey;
 import org.jbpm.console.ng.bd.model.ProcessInstanceKey;
@@ -32,14 +31,13 @@ import org.jbpm.console.ng.bd.model.ProcessSummary;
 import org.jbpm.console.ng.bd.model.RuntimeLogSummary;
 import org.jbpm.console.ng.bd.model.TaskDefSummary;
 import org.jbpm.console.ng.bd.model.UserTaskSummary;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -50,13 +48,9 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @ApplicationScoped
-public class RemoteRuntimeDataServiceImpl implements RemoteRuntimeDataService {
+public class RemoteProcessRuntimeDataServiceImpl extends AbstractKieServerService implements ProcessRuntimeDataService {
 
-    private static final Logger logger = LoggerFactory.getLogger(RemoteRuntimeDataServiceImpl.class);
-
-    @Inject
-    private KieServerIntegration kieServerIntegration;
-
+    private static final Logger logger = LoggerFactory.getLogger(RemoteProcessRuntimeDataServiceImpl.class);
 
     public List<ProcessInstanceSummary> getProcessInstances(String serverTemplateId, List<Integer> statuses, Integer page, Integer pageSize) {
 
@@ -318,12 +312,4 @@ public class RemoteRuntimeDataServiceImpl implements RemoteRuntimeDataService {
         return summary;
     }
 
-    protected <T> T getClient(String serverTemplateId, Class<T> serviceClass) {
-        KieServicesClient client = kieServerIntegration.getServerClient(serverTemplateId);
-        if (client == null) {
-            throw new RuntimeException("No client to interact with server " + serverTemplateId);
-        }
-
-        return client.getServicesClient(serviceClass);
-    }
 }

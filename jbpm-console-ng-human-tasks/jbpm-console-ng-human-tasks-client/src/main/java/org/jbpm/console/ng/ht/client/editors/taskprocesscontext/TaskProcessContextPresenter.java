@@ -29,9 +29,9 @@ import org.jbpm.console.ng.bd.model.ProcessInstanceSummary;
 import org.jbpm.console.ng.ht.model.TaskSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesWithDetailsRequestEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.uberfire.client.mvp.Activity;
 import org.uberfire.client.mvp.ActivityManager;
 import org.uberfire.client.mvp.PlaceManager;
@@ -63,9 +63,9 @@ public class TaskProcessContextPresenter {
 
     private Event<ProcessInstancesWithDetailsRequestEvent> processInstanceSelected;
 
-    private Caller<RemoteTaskService> taskService;
+    private Caller<TaskService> taskService;
 
-    private Caller<RemoteRuntimeDataService> dataServices;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
     private long currentTaskId = 0;
     private long currentProcessInstanceId = -1L;
@@ -76,13 +76,13 @@ public class TaskProcessContextPresenter {
     @Inject
     public TaskProcessContextPresenter(TaskProcessContextView view,
                                        PlaceManager placeManager,
-                                       Caller<RemoteTaskService> taskService,
-                                       Caller<RemoteRuntimeDataService> dataServices,
+                                       Caller<TaskService> taskService,
+                                       Caller<ProcessRuntimeDataService> processRuntimeDataService,
                                        Event<ProcessInstancesWithDetailsRequestEvent> processInstanceSelected,
                                        ActivityManager activityManager) {
         this.view = view;
         this.taskService = taskService;
-        this.dataServices = dataServices;
+        this.processRuntimeDataService = processRuntimeDataService;
         this.placeManager = placeManager;
         this.processInstanceSelected = processInstanceSelected;
         this.activityManager = activityManager;
@@ -101,7 +101,7 @@ public class TaskProcessContextPresenter {
     }
 
     public void goToProcessInstanceDetails() {
-        dataServices.call(new RemoteCallback<ProcessInstanceSummary>() {
+        processRuntimeDataService.call(new RemoteCallback<ProcessInstanceSummary>() {
                               @Override
                               public void callback(ProcessInstanceSummary summary) {
                                   placeManager.goTo(PROCESS_INSTANCE_DETAILS);

@@ -29,7 +29,7 @@ import org.jbpm.console.ng.gc.client.util.DateUtils;
 import org.jbpm.console.ng.ht.model.TaskEventSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 
 @Dependent
@@ -47,16 +47,16 @@ public class TaskLogsPresenter {
 
     private TaskLogsView view;
 
-    private Caller<RemoteTaskService> remoteTaskService;
+    private Caller<TaskService> taskService;
 
     private long currentTaskId = 0;
     private String serverTemplateId;
     private String containerId;
 
     @Inject
-    public TaskLogsPresenter( final TaskLogsView view, final Caller<RemoteTaskService> remoteTaskService) {
+    public TaskLogsPresenter( final TaskLogsView view, final Caller<TaskService> taskService) {
         this.view = view;
-        this.remoteTaskService = remoteTaskService;
+        this.taskService = taskService;
     }
 
     @PostConstruct
@@ -70,7 +70,7 @@ public class TaskLogsPresenter {
 
     public void refreshLogs() {
         view.setLogTextAreaText("");
-        remoteTaskService.call(
+        taskService.call(
                 new RemoteCallback<List<TaskEventSummary>>() {
                     @Override
                     public void callback(List<TaskEventSummary>events) {

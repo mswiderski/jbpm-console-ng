@@ -54,8 +54,8 @@ import org.jbpm.console.ng.pr.model.events.NewProcessInstanceEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstanceSelectionEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesUpdateEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesWithDetailsRequestEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
@@ -119,9 +119,9 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
     protected final List<ProcessInstanceSummary> myProcessInstancesFromDataSet = new ArrayList<ProcessInstanceSummary>();
 
     @Inject
-    private Caller<RemoteRuntimeDataService> remoteRuntimeDataService;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
-    private Caller<RemoteProcessService> remoteProcessService;
+    private Caller<ProcessService> processService;
 
     @Inject
     private Event<ProcessInstanceSelectionEvent> processInstanceSelected;
@@ -176,7 +176,7 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
                     } else if (currentTableSettings.getKey().equals(PROCESS_INSTANCES_WITH_VARIABLES_INCLUDED_LIST_PREFIX+"_2")) {
                         statuses.add(ProcessInstance.STATE_ABORTED);
                     }
-                    remoteRuntimeDataService.call(new RemoteCallback<List<ProcessInstanceSummary>>() {
+                    processRuntimeDataService.call(new RemoteCallback<List<ProcessInstanceSummary>>() {
                         @Override
                         public void callback(List<ProcessInstanceSummary> processInstanceSummaries) {
                             boolean lastPageExactCount=false;
@@ -344,7 +344,7 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
     }
 
     public void abortProcessInstance( String containerId, long processInstanceId ) {
-        remoteProcessService.call( new RemoteCallback<Void>() {
+        processService.call(new RemoteCallback<Void>() {
             @Override
             public void callback( Void v ) {
                 refreshGrid();
@@ -353,7 +353,7 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
     }
 
     public void abortProcessInstance( List<String> containers, List<Long> processInstanceIds ) {
-        remoteProcessService.call( new RemoteCallback<Void>() {
+        processService.call(new RemoteCallback<Void>() {
             @Override
             public void callback( Void v ) {
                 refreshGrid();
@@ -507,7 +507,7 @@ public class DataSetProcessInstanceWithVariablesListPresenter extends AbstractSc
     }
 
     @Inject
-    public void setRemoteProcessService(final Caller<RemoteProcessService> remoteProcessService) {
-        this.remoteProcessService = remoteProcessService;
+    public void setProcessService(final Caller<ProcessService> processService) {
+        this.processService = processService;
     }
 }

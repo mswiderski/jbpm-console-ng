@@ -40,7 +40,7 @@ import org.jbpm.console.ng.df.client.list.base.DataSetQueryHelper;
 import org.jbpm.console.ng.gc.client.experimental.grid.base.ExtendedPagedTable;
 import org.jbpm.console.ng.gc.client.list.base.events.SearchEvent;
 import org.jbpm.console.ng.pr.client.editors.instance.signal.ProcessInstanceSignalPresenter;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.pr.service.ProcessService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,10 +62,10 @@ import static org.mockito.Mockito.*;
 @RunWith(GwtMockitoTestRunner.class)
 public class DataSetProcessInstanceWithVariablesListPresenterTest {
 
-    private CallerMock<RemoteProcessService> remoteProcessServiceCaller;
+    private CallerMock<ProcessService> remoteProcessServiceCaller;
 
     @Mock
-    private RemoteProcessService remoteProcessService;
+    private ProcessService processService;
 
     @Mock
     private DataSetProcessInstanceWithVariablesListViewImpl viewMock;
@@ -102,7 +102,7 @@ public class DataSetProcessInstanceWithVariablesListPresenterTest {
     @Before
     public void setupMocks() {
         //Mock that actually calls the callbacks
-        remoteProcessServiceCaller = new CallerMock<RemoteProcessService>(remoteProcessService);
+        remoteProcessServiceCaller = new CallerMock<ProcessService>(processService);
 
         processInstanceSummaries = createProcessInstanceSummaryList(5);
 
@@ -130,7 +130,7 @@ public class DataSetProcessInstanceWithVariablesListPresenterTest {
             }
         }).when(dataSetQueryHelperDomainSpecific).lookupDataSet(anyInt(), any(DataSetReadyCallback.class));
 
-        presenter.setRemoteProcessService(remoteProcessServiceCaller);
+        presenter.setProcessService(remoteProcessServiceCaller);
     }
 
     @Test
@@ -169,7 +169,7 @@ public class DataSetProcessInstanceWithVariablesListPresenterTest {
 
         presenter.abortProcessInstance(containerId, processInstanceId);
 
-        verify(remoteProcessService).abortProcessInstance(anyString(), eq(containerId), eq(processInstanceId));
+        verify(processService).abortProcessInstance(anyString(), eq(containerId), eq(processInstanceId));
     }
 
     @Test
@@ -185,7 +185,7 @@ public class DataSetProcessInstanceWithVariablesListPresenterTest {
 
         presenter.abortProcessInstance(containers, pIds);
 
-        verify(remoteProcessService).abortProcessInstances(anyString(), eq(containers), eq(pIds));
+        verify(processService).abortProcessInstances(anyString(), eq(containers), eq(pIds));
     }
 
     @Test
@@ -199,7 +199,7 @@ public class DataSetProcessInstanceWithVariablesListPresenterTest {
 
         presenter.bulkAbort(processInstanceSummaries);
 
-        verify(remoteProcessService).abortProcessInstances(anyString(), eq(containers), eq(pIds));
+        verify(processService).abortProcessInstances(anyString(), eq(containers), eq(pIds));
     }
 
     @Test
@@ -216,7 +216,7 @@ public class DataSetProcessInstanceWithVariablesListPresenterTest {
 
         presenter.bulkAbort(processInstanceSummaries);
 
-        verify(remoteProcessService).abortProcessInstances(anyString(), eq(containers), eq(pIds));
+        verify(processService).abortProcessInstances(anyString(), eq(containers), eq(pIds));
     }
 
     @Test

@@ -25,7 +25,7 @@ import org.jbpm.console.ng.bd.model.ProcessDefinitionKey;
 import org.jbpm.console.ng.bd.model.ProcessSummary;
 import org.jbpm.console.ng.pr.client.editors.definition.details.BaseProcessDefDetailsPresenter;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.uberfire.backend.vfs.VFSService;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 
@@ -43,7 +43,7 @@ public class BasicProcessDefDetailsPresenter extends BaseProcessDefDetailsPresen
     private BasicProcessDefDetailsView view;
 
     @Inject
-    private Caller<RemoteRuntimeDataService> processDefService;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
     @Inject
     private Caller<VFSService> fileServices;
@@ -61,7 +61,7 @@ public class BasicProcessDefDetailsPresenter extends BaseProcessDefDetailsPresen
 
     private void refreshProcessItems( final String serverTemplateId, final String deploymentId, final String processId ) {
 
-        processDefService.call( new RemoteCallback<ProcessSummary>() {
+        processRuntimeDataService.call(new RemoteCallback<ProcessSummary>() {
 
             @Override
             public void callback( ProcessSummary process ) {

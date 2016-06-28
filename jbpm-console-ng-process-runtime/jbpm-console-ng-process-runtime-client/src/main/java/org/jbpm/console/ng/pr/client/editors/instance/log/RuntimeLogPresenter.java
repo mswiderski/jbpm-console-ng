@@ -30,7 +30,7 @@ import org.jbpm.console.ng.bd.model.RuntimeLogSummary;
 import org.jbpm.console.ng.pr.client.util.LogUtils.LogOrder;
 import org.jbpm.console.ng.pr.client.util.LogUtils.LogType;
 import org.jbpm.console.ng.pr.model.events.ProcessInstanceSelectionEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 
 
@@ -52,7 +52,7 @@ public class RuntimeLogPresenter {
     private RuntimeLogView view;
 
     @Inject
-    private Caller<RemoteRuntimeDataService> dataServices;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
     @PostConstruct
     public void init() {
@@ -67,7 +67,7 @@ public class RuntimeLogPresenter {
                                             final LogType logType ) {
 
         if ( LogType.TECHNICAL.equals( logType ) ) {
-            dataServices.call( new RemoteCallback<List<RuntimeLogSummary>>() {
+            processRuntimeDataService.call(new RemoteCallback<List<RuntimeLogSummary>>() {
                 @Override
                 public void callback( List<RuntimeLogSummary> logs ) {
                     final List<String> logsLine = new ArrayList<String>();
@@ -84,7 +84,7 @@ public class RuntimeLogPresenter {
                 }
             }, new DefaultErrorCallback() ).getRuntimeLogs(currentServerTemplateId, currentProcessInstanceId);
         } else {
-            dataServices.call( new RemoteCallback<List<RuntimeLogSummary>>() {
+            processRuntimeDataService.call(new RemoteCallback<List<RuntimeLogSummary>>() {
                 @Override
                 public void callback( List<RuntimeLogSummary> logs ) {
                     final List<String> logsLine = new ArrayList<String>();

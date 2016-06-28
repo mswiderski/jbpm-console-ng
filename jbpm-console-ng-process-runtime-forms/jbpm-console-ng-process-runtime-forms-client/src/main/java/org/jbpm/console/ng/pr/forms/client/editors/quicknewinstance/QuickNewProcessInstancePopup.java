@@ -55,8 +55,7 @@ import org.jbpm.console.ng.pr.forms.client.i18n.Constants;
 import org.jbpm.console.ng.pr.forms.display.process.api.ProcessDisplayerConfig;
 import org.jbpm.console.ng.bd.model.ProcessDefinitionKey;
 import org.jbpm.console.ng.bd.model.ProcessSummary;
-import org.jbpm.console.ng.pr.service.ProcessDefinitionService;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.uberfire.ext.widgets.common.client.common.popups.BaseModal;
 import org.uberfire.ext.widgets.common.client.common.popups.footers.GenericModalFooter;
 import org.uberfire.mvp.Command;
@@ -111,7 +110,7 @@ public class QuickNewProcessInstancePopup extends BaseModal implements FormDispl
     private Event<NotificationEvent> notification;
 
     @Inject
-    private Caller<RemoteRuntimeDataService> processDefinitionService;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
     protected QueryFilter currentFilter;
 
@@ -182,7 +181,7 @@ public class QuickNewProcessInstancePopup extends BaseModal implements FormDispl
                                                  false, "",
                                                  "",
                                                  true );
-        processDefinitionService.call( new RemoteCallback<List<ProcessSummary>>() {
+        processRuntimeDataService.call(new RemoteCallback<List<ProcessSummary>>() {
             @Override
             public void callback( List<ProcessSummary> processSummaries ) {
 

@@ -24,9 +24,9 @@ import org.jbpm.console.ng.bd.model.ProcessInstanceSummary;
 import org.jbpm.console.ng.ht.client.editors.taskprocesscontext.TaskProcessContextPresenter.TaskProcessContextView;
 import org.jbpm.console.ng.ht.model.TaskSummary;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesWithDetailsRequestEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +54,7 @@ public class TaskProcessContextPresenterTest {
     TaskSummary taskWithProcess = new TaskSummary(TASK_ID_WITH_PROC, "task with process", null, null, 0, null, null, null, null, null, "TEST_PROCESS_ID"/*ProcessID*/, -1, 123L /*Proc inst Id*/, null, -1);
 
     @Mock
-    RemoteRuntimeDataService dataServiceEntryPoint;
+    ProcessRuntimeDataService dataServiceEntryPoint;
 
     @Mock
     Event<ProcessInstancesWithDetailsRequestEvent> procNavigationMock;
@@ -71,15 +71,15 @@ public class TaskProcessContextPresenterTest {
     @Before
     public void before() {
         //Task query service mock
-        RemoteTaskService tqs = mock(RemoteTaskService.class);
+        TaskService tqs = mock(TaskService.class);
         when(tqs.getTask(null, null, TASK_ID_NO_PROCESS)).thenReturn(taskNoProcess);
         when(tqs.getTask(null, null, TASK_ID_WITH_PROC)).thenReturn(taskWithProcess);
         when(tqs.getTask(null, null, TASK_ID_NULL_DETAILS)).thenReturn(null);
-        CallerMock<RemoteTaskService> taskQueryServiceMock
-                = new CallerMock<RemoteTaskService>(tqs);
+        CallerMock<TaskService> taskQueryServiceMock
+                = new CallerMock<TaskService>(tqs);
 
         // DataService caller mock
-        CallerMock<RemoteRuntimeDataService> dataServiceCallerMock = new CallerMock<RemoteRuntimeDataService>(dataServiceEntryPoint);
+        CallerMock<ProcessRuntimeDataService> dataServiceCallerMock = new CallerMock<ProcessRuntimeDataService>(dataServiceEntryPoint);
 
         presenter = new TaskProcessContextPresenter(
                 viewMock,

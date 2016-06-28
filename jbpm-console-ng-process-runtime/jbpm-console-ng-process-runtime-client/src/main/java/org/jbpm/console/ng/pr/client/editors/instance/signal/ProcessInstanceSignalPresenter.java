@@ -29,7 +29,7 @@ import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesUpdateEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.pr.service.ProcessService;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchPopup;
@@ -74,7 +74,7 @@ public class ProcessInstanceSignalPresenter {
     private PlaceRequest place;
 
     @Inject
-    private Caller<RemoteProcessService> processService;
+    private Caller<ProcessService> processService;
 
     private String serverTemplateId;
     private String[] deploymentId;

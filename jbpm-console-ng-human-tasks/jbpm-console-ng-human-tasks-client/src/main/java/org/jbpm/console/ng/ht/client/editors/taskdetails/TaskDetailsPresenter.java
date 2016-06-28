@@ -31,7 +31,7 @@ import org.jbpm.console.ng.ht.model.TaskSummary;
 import org.jbpm.console.ng.ht.model.events.TaskCalendarEvent;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesWithDetailsRequestEvent;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
@@ -81,7 +81,7 @@ public class TaskDetailsPresenter {
     private Event<ProcessInstancesWithDetailsRequestEvent> processInstanceSelected;
 
     @Inject
-    private Caller<RemoteTaskService> taskService;
+    private Caller<TaskService> taskService;
 
 
     @Inject

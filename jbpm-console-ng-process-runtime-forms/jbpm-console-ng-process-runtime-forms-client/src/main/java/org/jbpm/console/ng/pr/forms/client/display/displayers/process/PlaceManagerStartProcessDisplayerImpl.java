@@ -27,20 +27,16 @@ import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import org.jboss.errai.common.client.api.Caller;
 import org.jbpm.console.ng.gc.forms.client.display.displayers.util.PlaceManagerFormActivitySearcher;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.pr.service.ProcessService;
 import org.uberfire.ext.widgets.common.client.forms.GetFormParamsEvent;
 import org.uberfire.ext.widgets.common.client.forms.RequestFormParamsEvent;
 import org.uberfire.ext.widgets.common.client.forms.SetFormParamsEvent;
 
-/**
- *
- * @author salaboy
- */
 @Dependent
 public class PlaceManagerStartProcessDisplayerImpl extends AbstractStartProcessFormDisplayer {
 
     @Inject
-    private Caller<RemoteProcessService> processService;
+    private Caller<ProcessService> processService;
 
     @Inject
     private PlaceManagerFormActivitySearcher placeManagerFormActivitySearcher;

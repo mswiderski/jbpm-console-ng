@@ -24,7 +24,6 @@ import java.util.Set;
 
 import javax.enterprise.event.Event;
 
-import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.Range;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.dashbuilder.dataset.DataSet;
@@ -46,7 +45,7 @@ import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelectorMenuBuilder;
 import org.jbpm.console.ng.ht.client.editors.taskslist.grid.dash.DataSetTasksListGridViewImpl;
 import org.jbpm.console.ng.ht.model.TaskSummary;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -95,9 +94,9 @@ public abstract class AbstractTasksListGridPresenterTest {
     protected User identity;
 
     @Mock
-    protected RemoteTaskService remoteTaskService;
+    protected TaskService taskService;
 
-    protected CallerMock<RemoteTaskService> callerMockRemoteTaskService;
+    protected CallerMock<TaskService> callerMockRemoteTaskService;
 
     @Mock
     protected ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder;
@@ -107,8 +106,8 @@ public abstract class AbstractTasksListGridPresenterTest {
 
     @Before
     public void setupMocks() {
-        callerMockRemoteTaskService = new CallerMock<RemoteTaskService>(remoteTaskService);
-        getPresenter().setRemoteTaskService(callerMockRemoteTaskService);
+        callerMockRemoteTaskService = new CallerMock<TaskService>(taskService);
+        getPresenter().setTaskService(callerMockRemoteTaskService);
 
         doNothing().when(taskSelected).fire(any(TaskSelectionEvent.class));
 
@@ -163,7 +162,7 @@ public abstract class AbstractTasksListGridPresenterTest {
 
         getPresenter().releaseTask(task);
 
-        verify(remoteTaskService).releaseTask("", TASK_DEPLOYMENT_ID, TASK_ID);
+        verify(taskService).releaseTask("", TASK_DEPLOYMENT_ID, TASK_ID);
     }
 
     @Test
@@ -172,7 +171,7 @@ public abstract class AbstractTasksListGridPresenterTest {
 
         getPresenter().claimTask(task);
 
-        verify(remoteTaskService).claimTask("", TASK_DEPLOYMENT_ID, TASK_ID);
+        verify(taskService).claimTask("", TASK_DEPLOYMENT_ID, TASK_ID);
     }
 
     @Test

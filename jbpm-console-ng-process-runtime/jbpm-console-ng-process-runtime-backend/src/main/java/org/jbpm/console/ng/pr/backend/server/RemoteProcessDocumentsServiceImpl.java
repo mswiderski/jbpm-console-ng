@@ -25,28 +25,26 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
+import org.jbpm.console.ng.bd.integration.AbstractKieServerService;
 import org.jbpm.console.ng.bd.model.DocumentSummary;
 import org.jbpm.console.ng.bd.model.ProcessVariableSummary;
 import org.jbpm.console.ng.ga.model.QueryFilter;
 import org.jbpm.console.ng.pr.service.ProcessDocumentsService;
 import org.jbpm.console.ng.pr.service.ProcessVariablesService;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
 import org.jbpm.document.Document;
+import org.kie.server.client.DocumentServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.paging.PageResponse;
 
 @Service
 @ApplicationScoped
-public class ProcessDocumentsServiceImpl implements ProcessDocumentsService {
+public class RemoteProcessDocumentsServiceImpl extends AbstractKieServerService implements ProcessDocumentsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessDocumentsServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(RemoteProcessDocumentsServiceImpl.class);
 
     @Inject
     private ProcessVariablesService processVariablesService;
-
-    @Inject
-    private RemoteProcessService remoteProcessService;
 
     @Override
     public PageResponse<DocumentSummary> getData(QueryFilter filter) {
@@ -95,12 +93,18 @@ public class ProcessDocumentsServiceImpl implements ProcessDocumentsService {
                         } catch (ParseException ex) {
                             logger.error("Can not parse last modified date!", ex);
                         }
-                        documents.add(new DocumentSummary(values[0], lastModified, Long.valueOf(values[1]), remoteProcessService.getDocumentLink(serverTemplateId, values[3])));
+                        documents.add(new DocumentSummary(values[0], lastModified, Long.valueOf(values[1]), getDocumentLink(serverTemplateId, values[3])));
                     }
                 }
             }
         }
         return documents;
+    }
+
+    @Override
+    public String getDocumentLink(final String serverTemplateId, final String documentIdentifier) {
+        DocumentServicesClient documentClient = getClient(serverTemplateId, DocumentServicesClient.class);
+        return documentClient.getDocumentLink(documentIdentifier);
     }
 
 }

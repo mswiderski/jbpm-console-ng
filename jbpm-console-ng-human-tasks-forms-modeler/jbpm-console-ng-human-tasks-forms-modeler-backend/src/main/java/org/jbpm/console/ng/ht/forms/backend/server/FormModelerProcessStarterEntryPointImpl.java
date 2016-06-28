@@ -21,8 +21,8 @@ import javax.inject.Inject;
 
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.console.ng.ht.forms.modeler.service.FormModelerProcessStarterEntryPoint;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.ht.service.TaskService;
+import org.jbpm.console.ng.pr.service.ProcessService;
 import org.jbpm.formModeler.api.client.FormRenderContextManager;
 
 @Service
@@ -32,17 +32,17 @@ public class FormModelerProcessStarterEntryPointImpl implements FormModelerProce
     private FormRenderContextManager formRenderContextManager;
 
     @Inject
-    private RemoteProcessService remoteProcessService;
+    private ProcessService processService;
 
     @Inject
-    private RemoteTaskService taskService;
+    private TaskService taskService;
 
     @Override
     public Long startProcessFromRenderContext(String ctxUID, String serverTemplateId, String domainId, String processId, String correlationKey, Long parentProcessInstanceId) {
         Map<String, Object> params = formRenderContextManager.getFormRenderContext(ctxUID).getOutputData();
         formRenderContextManager.removeContext(ctxUID);
 
-        return remoteProcessService.startProcess(serverTemplateId, domainId, processId, correlationKey, params);
+        return processService.startProcess(serverTemplateId, domainId, processId, correlationKey, params);
 
     }
 

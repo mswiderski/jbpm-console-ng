@@ -33,7 +33,7 @@ import org.jbpm.console.ng.pr.client.editors.variables.list.ProcessVariableListP
 import org.jbpm.console.ng.pr.client.i18n.Constants;
 import org.jbpm.console.ng.pr.model.events.ProcessInstanceSelectionEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstancesUpdateEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteProcessService;
+import org.jbpm.console.ng.pr.service.ProcessService;
 import org.uberfire.client.annotations.DefaultPosition;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
@@ -78,7 +78,7 @@ public class ProcessInstanceDetailsMultiPresenter implements RefreshMenuBuilder.
     @Inject
     private PlaceManager placeManager;
     @Inject
-    private Caller<RemoteProcessService> processService;
+    private Caller<ProcessService> processService;
 
     @Inject
     private Event<ProcessInstanceSelectionEvent> processInstanceSelected;

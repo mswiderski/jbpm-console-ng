@@ -34,7 +34,7 @@ import org.jbpm.console.ng.bd.model.UserTaskSummary;
 import org.jbpm.console.ng.pr.client.i18n.Constants;
 import org.jbpm.console.ng.pr.model.events.ProcessInstanceSelectionEvent;
 import org.jbpm.console.ng.pr.model.events.ProcessInstanceStyleEvent;
-import org.jbpm.console.ng.pr.service.integration.RemoteRuntimeDataService;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 
@@ -74,7 +74,7 @@ public class ProcessInstanceDetailsPresenter {
     private Event<ProcessInstanceStyleEvent> processInstanceStyleEvent;
 
     @Inject
-    private Caller<RemoteRuntimeDataService> remoteRuntimeDataService;
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
 
     private Constants constants = Constants.INSTANCE;
 
@@ -115,7 +115,7 @@ public class ProcessInstanceDetailsPresenter {
         view.getStateText().setText("");
         view.getCurrentActivitiesListBox().setText( "" );
 
-        remoteRuntimeDataService.call( new RemoteCallback<ProcessInstanceSummary>() {
+        processRuntimeDataService.call(new RemoteCallback<ProcessInstanceSummary>() {
             @Override
             public void callback( final ProcessInstanceSummary process ) {
                 view.getProcessDefinitionIdText().setText( process.getProcessId() );
@@ -166,7 +166,7 @@ public class ProcessInstanceDetailsPresenter {
         }, new DefaultErrorCallback() ).getProcessInstance(serverTemplateId, new ProcessInstanceKey(serverTemplateId, Long.parseLong(processId)));
 
 
-        remoteRuntimeDataService.call( new RemoteCallback<List<NodeInstanceSummary>>() {
+        processRuntimeDataService.call(new RemoteCallback<List<NodeInstanceSummary>>() {
             @Override
             public void callback( final List<NodeInstanceSummary> details ) {
                 final SafeHtmlBuilder safeHtmlBuilder = new SafeHtmlBuilder();

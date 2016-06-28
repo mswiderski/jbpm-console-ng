@@ -27,7 +27,7 @@ import org.jboss.errai.common.client.api.Caller;
 import org.jbpm.console.ng.ht.model.TaskEventSummary;
 import org.jbpm.console.ng.ht.model.events.TaskRefreshedEvent;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
-import org.jbpm.console.ng.ht.service.integration.RemoteTaskService;
+import org.jbpm.console.ng.ht.service.TaskService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,9 +42,9 @@ public class TaskLogsPresenterTest {
     private static final Long TASK_ID = 1L;
 
     @Mock
-    private RemoteTaskService remoteTaskService;
+    private TaskService taskService;
 
-    private Caller<RemoteTaskService> remoteTaskServiceCaller;
+    private Caller<TaskService> remoteTaskServiceCaller;
 
     @Mock
     private TaskLogsPresenter.TaskLogsView taskLogsView;
@@ -53,9 +53,9 @@ public class TaskLogsPresenterTest {
 
     @Before
     public void setupMocks() {
-        remoteTaskServiceCaller = new CallerMock<RemoteTaskService>(remoteTaskService);
+        remoteTaskServiceCaller = new CallerMock<TaskService>(taskService);
         presenter = new TaskLogsPresenter( taskLogsView, remoteTaskServiceCaller);
-        when(remoteTaskService.getTaskComments("", "", 1l)).thenReturn(mock(List.class));
+        when(taskService.getTaskComments("", "", 1l)).thenReturn(mock(List.class));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class TaskLogsPresenterTest {
         presenter.onTaskSelectionEvent( new TaskSelectionEvent( TASK_ID ) );
 
         //Logs retrieved and text area refreshed
-        verify( remoteTaskService ).getTaskEvents(anyString(), anyString(), anyLong());
+        verify(taskService).getTaskEvents(anyString(), anyString(), anyLong());
         verify( taskLogsView, times(2) ).setLogTextAreaText( "" );
     }
 
@@ -77,7 +77,7 @@ public class TaskLogsPresenterTest {
         presenter.onTaskRefreshedEvent( new TaskRefreshedEvent( TASK_ID ) );
 
         //Logs retrieved and text area refreshed
-        verify( remoteTaskService, times( 2 ) ).getTaskEvents(anyString(), anyString(), anyLong());
+        verify(taskService, times( 2 ) ).getTaskEvents(anyString(), anyString(), anyLong());
         verify( taskLogsView, times( 4 ) ).setLogTextAreaText( "" );
     }
 
@@ -90,14 +90,14 @@ public class TaskLogsPresenterTest {
         presenter.onTaskRefreshedEvent( new TaskRefreshedEvent( TASK_ID + 1 ) );
 
         //Logs retrieved and text area refreshed
-        verify( remoteTaskService).getTaskEvents(anyString(), anyString(), anyLong());
+        verify(taskService).getTaskEvents(anyString(), anyString(), anyLong());
         verify( taskLogsView, times(2) ).setLogTextAreaText( "" );
     }
 
     @Test
     public void logEventsAreFormattedProperly() {
         List<TaskEventSummary> eventSummaries = createEventSummariesForTaks(TASK_ID);
-        when(remoteTaskService.getTaskEvents(anyString(), anyString(), eq(TASK_ID)))
+        when(taskService.getTaskEvents(anyString(), anyString(), eq(TASK_ID)))
                 .thenReturn(eventSummaries);
 
         presenter.onTaskSelectionEvent(new TaskSelectionEvent(TASK_ID));
