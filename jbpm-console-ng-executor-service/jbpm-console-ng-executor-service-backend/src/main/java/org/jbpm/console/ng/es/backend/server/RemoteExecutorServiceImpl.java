@@ -31,7 +31,7 @@ import org.jbpm.console.ng.es.model.RequestDetails;
 import org.jbpm.console.ng.es.model.RequestKey;
 import org.jbpm.console.ng.es.model.RequestParameterSummary;
 import org.jbpm.console.ng.es.model.RequestSummary;
-import org.jbpm.console.ng.es.service.ExecutorServiceEntryPoint;
+import org.jbpm.console.ng.es.service.ExecutorService;
 import org.jbpm.console.ng.ga.model.QueryFilter;
 import org.jbpm.console.ng.ga.service.GenericServiceEntryPoint;
 import org.kie.api.executor.RequestInfo;
@@ -46,11 +46,9 @@ import org.uberfire.paging.PageResponse;
 
 @Service
 @ApplicationScoped
-public class ExecutorServiceEntryPointImpl extends AbstractKieServerService implements ExecutorServiceEntryPoint ,GenericServiceEntryPoint<RequestKey, RequestSummary> {
+public class RemoteExecutorServiceImpl extends AbstractKieServerService implements ExecutorService,GenericServiceEntryPoint<RequestKey, RequestSummary> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceEntryPointImpl.class);
-
-    private boolean executorDisabled = false;
+    private static final Logger logger = LoggerFactory.getLogger(RemoteExecutorServiceImpl.class);
 
     @Override
     public RequestDetails getRequestDetails(String serverTemplateId, Long requestId) {
@@ -105,55 +103,6 @@ public class ExecutorServiceEntryPointImpl extends AbstractKieServerService impl
     public void requeueRequest(String serverTemplateId, Long requestId) {
         JobServicesClient jobClient = getClient(serverTemplateId, JobServicesClient.class);
         jobClient.requeueRequest(requestId);
-    }
-
-    @Override
-    public void init() {
-
-    }
-
-    @Override
-    public void destroy() {
-
-    }
-
-    @Override
-    public Boolean isActive() {
-        return false;
-    }
-
-    @Override
-    public Boolean startStopService(int waitTime, int nroOfThreads) {
-        return false;
-    }
-
-    @Override
-    public int getInterval() {
-        return -1;
-    }
-
-    @Override
-    public void setInterval(int waitTime) {
-    }
-
-    @Override
-    public int getRetries() {
-        return -1;
-    }
-
-    @Override
-    public void setRetries(int defaultNroOfRetries) {
-
-    }
-
-    @Override
-    public int getThreadPoolSize() {
-        return -1;
-    }
-
-    @Override
-    public void setThreadPoolSize(int nroOfThreads) {
-
     }
 
     @Override
@@ -213,11 +162,6 @@ public class ExecutorServiceEntryPointImpl extends AbstractKieServerService impl
             
         }
         return requestSummarys;
-    }
-
-    @Override
-    public boolean isExecutorDisabled() {
-        return executorDisabled;
     }
 
 }

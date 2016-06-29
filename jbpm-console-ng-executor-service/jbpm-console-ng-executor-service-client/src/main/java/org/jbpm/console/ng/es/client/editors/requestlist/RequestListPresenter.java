@@ -39,11 +39,10 @@ import org.jbpm.console.ng.df.client.filter.FilterSettings;
 import org.jbpm.console.ng.df.client.list.base.DataSetQueryHelper;
 import org.jbpm.console.ng.es.client.editors.jobdetails.JobDetailsPopup;
 import org.jbpm.console.ng.es.client.editors.quicknewjob.QuickNewJobPopup;
-import org.jbpm.console.ng.es.client.editors.servicesettings.JobServiceSettingsPopup;
 import org.jbpm.console.ng.es.client.i18n.Constants;
 import org.jbpm.console.ng.es.model.RequestSummary;
 import org.jbpm.console.ng.es.model.events.RequestChangedEvent;
-import org.jbpm.console.ng.es.service.ExecutorServiceEntryPoint;
+import org.jbpm.console.ng.es.service.ExecutorService;
 import org.jbpm.console.ng.gc.client.dataset.AbstractDataSetReadyCallback;
 import org.jbpm.console.ng.gc.client.list.base.AbstractListView.ListView;
 import org.jbpm.console.ng.gc.client.list.base.AbstractScreenListPresenter;
@@ -84,16 +83,13 @@ public class RequestListPresenter extends AbstractScreenListPresenter<RequestSum
     private RequestListView view;
 
     @Inject
-    private Caller<ExecutorServiceEntryPoint> executorServices;
+    private Caller<ExecutorService> executorServices;
 
     @Inject
     private Event<RequestChangedEvent> requestChangedEvent;
 
     @Inject
     DataSetQueryHelper dataSetQueryHelper;
-
-    @Inject
-    private JobServiceSettingsPopup jobServiceSettingsPopup;
 
     @Inject
     private QuickNewJobPopup quickNewJobPopup;
@@ -111,7 +107,7 @@ public class RequestListPresenter extends AbstractScreenListPresenter<RequestSum
     }
 
     public RequestListPresenter(RequestListViewImpl view,
-            Caller<ExecutorServiceEntryPoint> executorServices,
+            Caller<ExecutorService> executorServices,
             DataSetQueryHelper dataSetQueryHelper,Event<RequestChangedEvent> requestChangedEvent
     ) {
         this.view = view;

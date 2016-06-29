@@ -24,7 +24,7 @@ import org.jbpm.console.ng.df.client.filter.FilterSettingsBuilderHelper;
 import org.jbpm.console.ng.df.client.list.base.DataSetQueryHelper;
 import org.jbpm.console.ng.es.model.RequestSummary;
 import org.jbpm.console.ng.es.model.events.RequestChangedEvent;
-import org.jbpm.console.ng.es.service.ExecutorServiceEntryPoint;
+import org.jbpm.console.ng.es.service.ExecutorService;
 import org.jbpm.console.ng.gc.client.experimental.grid.base.ExtendedPagedTable;
 import org.jbpm.console.ng.gc.client.list.base.events.SearchEvent;
 import org.jbpm.console.ng.gc.client.util.DateUtils;
@@ -46,10 +46,10 @@ public class RequestListPresenterTest {
 
     private static final Long REQUESTID_ID = 1L;
 
-    private CallerMock<ExecutorServiceEntryPoint> callerMockExecutorService;
+    private CallerMock<ExecutorService> callerMockExecutorService;
 
     @Mock
-    private ExecutorServiceEntryPoint executorServiceMock;
+    private ExecutorService executorServiceMock;
 
     @Mock
     private RequestListViewImpl viewMock;
@@ -73,7 +73,7 @@ public class RequestListPresenterTest {
     @Before
     public void setupMocks() {
         //Mock that actually calls the callbacks
-        callerMockExecutorService = new CallerMock<ExecutorServiceEntryPoint>(executorServiceMock);
+        callerMockExecutorService = new CallerMock<ExecutorService>(executorServiceMock);
 
         filterSettings= createTableSettingsPrototype();
 

@@ -52,7 +52,6 @@ import org.jbpm.console.ng.df.client.filter.FilterSettings;
 import org.jbpm.console.ng.df.client.filter.FilterSettingsBuilderHelper;
 import org.jbpm.console.ng.df.client.list.base.DataSetEditorManager;
 import org.jbpm.console.ng.es.client.editors.quicknewjob.QuickNewJobPopup;
-import org.jbpm.console.ng.es.client.editors.servicesettings.JobServiceSettingsPopup;
 import org.jbpm.console.ng.es.client.i18n.Constants;
 import org.jbpm.console.ng.es.model.RequestSummary;
 import org.jbpm.console.ng.es.model.events.RequestChangedEvent;
@@ -92,9 +91,6 @@ public class RequestListViewImpl extends AbstractMultiGridView<RequestSummary, R
 
     @Inject
     private DataSetEditorManager dataSetEditorManager;
-
-    @Inject
-    private JobServiceSettingsPopup jobServiceSettingsPopup;
 
     @Override
     public void init( final RequestListPresenter presenter ) {

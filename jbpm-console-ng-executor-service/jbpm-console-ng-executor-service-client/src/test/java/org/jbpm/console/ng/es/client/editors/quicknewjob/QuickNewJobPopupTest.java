@@ -25,7 +25,7 @@ import com.google.gwtmockito.WithClassesToStub;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.jbpm.console.ng.es.model.RequestDataSetConstants;
 import org.jbpm.console.ng.es.model.RequestParameterSummary;
-import org.jbpm.console.ng.es.service.ExecutorServiceEntryPoint;
+import org.jbpm.console.ng.es.service.ExecutorService;
 import org.jbpm.console.ng.gc.client.util.UTCDateBox;
 import org.jbpm.console.ng.gc.client.util.UTCTimeBox;
 import org.junit.Before;
@@ -50,10 +50,10 @@ public class QuickNewJobPopupTest {
     private int JOB_RETRIES = 5;
 
     @Mock
-    private CallerMock<ExecutorServiceEntryPoint> executorServices;
+    private CallerMock<ExecutorService> executorServices;
 
     @Mock
-    private ExecutorServiceEntryPoint executorServicesMock;
+    private ExecutorService executorServicesMock;
 
     @Mock
     public UTCTimeBox jobDueDateTime;
@@ -63,7 +63,7 @@ public class QuickNewJobPopupTest {
 
     @Before
     public void setupMocks() {
-        executorServices = new CallerMock<ExecutorServiceEntryPoint>(executorServicesMock);
+        executorServices = new CallerMock<ExecutorService>(executorServicesMock);
         quickNewJobPopup.setExecutorService(executorServices);
     }
 

@@ -44,7 +44,7 @@ import org.jbpm.console.ng.es.model.ErrorSummary;
 import org.jbpm.console.ng.es.model.RequestDetails;
 import org.jbpm.console.ng.es.model.RequestParameterSummary;
 import org.jbpm.console.ng.es.model.RequestSummary;
-import org.jbpm.console.ng.es.service.ExecutorServiceEntryPoint;
+import org.jbpm.console.ng.es.service.ExecutorService;
 import org.uberfire.ext.widgets.common.client.common.popups.BaseModal;
 import org.uberfire.ext.widgets.common.client.common.popups.footers.GenericModalFooter;
 import org.uberfire.ext.widgets.common.client.tables.ResizableHeader;
@@ -74,7 +74,7 @@ public class JobDetailsPopup extends BaseModal {
     public FormGroup errorControlGroup;
 
     @Inject
-    private Caller<ExecutorServiceEntryPoint> executorServices;
+    private Caller<ExecutorService> executorServices;
 
     private ListDataProvider<RequestParameterSummary> dataProvider = new ListDataProvider<RequestParameterSummary>();
 
