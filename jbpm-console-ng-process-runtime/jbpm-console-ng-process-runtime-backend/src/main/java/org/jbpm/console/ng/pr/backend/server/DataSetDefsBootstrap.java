@@ -15,29 +15,17 @@
  */
 package org.jbpm.console.ng.pr.backend.server;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.dashbuilder.dataset.def.DataColumnDef;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefFactory;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
-import org.dashbuilder.dataset.def.SQLDataSetDef;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
 import org.jbpm.dashboard.dataset.integration.KieServerDataSetProvider;
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.model.definition.QueryDefinition;
-import org.kie.server.client.KieServicesException;
-import org.kie.server.client.QueryServicesClient;
-import org.kie.server.controller.api.model.events.ServerInstanceConnected;
-import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uberfire.commons.async.SimpleAsyncExecutorService;
 import org.uberfire.commons.services.cdi.Startup;
 
 import static org.jbpm.console.ng.bd.model.ProcessInstanceDataSetConstants.*;
@@ -46,25 +34,18 @@ import static org.jbpm.console.ng.bd.model.ProcessInstanceDataSetConstants.*;
 @ApplicationScoped
 public class DataSetDefsBootstrap {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataSetDefsBootstrap.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataSetDefsBootstrap.class);
+    private static final String JBPM_DATA_SOURCE = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
 
     @Inject
     DataSetDefRegistry dataSetDefRegistry;
 
-    @Inject
-    private KieServerIntegration kieServerIntegration;
-
-    private DataSetDef processInstancesDef;
-    private DataSetDef processWithVariablesDef;
-
     @PostConstruct
     protected void registerDataSetDefinitions() {
-        final String jbpmDataSource = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
-
-        processInstancesDef = DataSetDefFactory.newSQLDataSetDef()
+        DataSetDef processInstancesDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(PROCESS_INSTANCE_DATASET)
                 .name("Process Instances")
-                .dataSource(jbpmDataSource)
+                .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +
                             "log.processInstanceId, " +
                             "log.processId, " +
@@ -98,11 +79,10 @@ public class DataSetDefsBootstrap {
                 .label(COLUMN_PROCESS_INSTANCE_DESCRIPTION)
                 .buildDef();
 
-
-        processWithVariablesDef = DataSetDefFactory.newSQLDataSetDef()
+        DataSetDef processWithVariablesDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(PROCESS_INSTANCE_WITH_VARIABLES_DATASET)
                 .name("Domain Specific Process Instances")
-                .dataSource(jbpmDataSource)
+                .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +
                             "vil.processInstanceId, " +
                             "vil.processId, " +
@@ -133,62 +113,7 @@ public class DataSetDefsBootstrap {
         // Register the data set definitions
         dataSetDefRegistry.registerDataSetDef(processInstancesDef);
         dataSetDefRegistry.registerDataSetDef(processWithVariablesDef);
-        logger.info("Process instance datasets registered");
-    }
-
-    public void registerInKieServer(@Observes final ServerInstanceConnected serverInstanceConnected) {
-        final ServerInstance serverInstance = serverInstanceConnected.getServerInstance();
-        final String serverInstanceId = serverInstance.getServerInstanceId();
-        logger.debug("Server instance '{}' connected, registering process related data sets", serverInstanceId);
-
-        SimpleAsyncExecutorService.getDefaultInstance().execute(new Runnable() {
-
-            @Override
-            public void run() {
-                final String serverTemplateId = serverInstance.getServerTemplateId();
-                try {
-                    long waitLimit = 5 * 60 * 1000;   // default 5 min
-                    long elapsed = 0;
-
-                    logger.info("Registering process instance data set definitions on connected server instance '{}'", serverInstanceId);
-                    QueryServicesClient queryClient = kieServerIntegration.getAdminServerClient(serverTemplateId).getServicesClient(QueryServicesClient.class);
-                    QueryDefinition processInstancesDefinition = QueryDefinition.builder()
-                            .name(processInstancesDef.getUUID())
-                            .expression(((SQLDataSetDef) processInstancesDef).getDbSQL())
-                            .source(((SQLDataSetDef) processInstancesDef).getDataSource())
-                            .target("CUSTOM")
-                            .build();
-
-                    QueryDefinition processWithVariablesDefinition = QueryDefinition.builder()
-                            .name(processWithVariablesDef.getUUID())
-                            .expression(((SQLDataSetDef) processWithVariablesDef).getDbSQL())
-                            .source(((SQLDataSetDef) processWithVariablesDef).getDataSource())
-                            .target("CUSTOM")
-                            .build();
-
-                    while (elapsed < waitLimit) {
-                        try {
-
-                            queryClient.replaceQuery(processInstancesDefinition);
-                            logger.info("Query {} definition successfully registered on kie server '{}'", PROCESS_INSTANCE_DATASET, serverInstanceId);
-
-                            queryClient.replaceQuery(processWithVariablesDefinition);
-                            logger.info("Query {} definition successfully registered on kie server '{}'", PROCESS_INSTANCE_WITH_VARIABLES_DATASET, serverInstanceId);
-                            return;
-                        } catch (KieServicesException e) {
-                            // unable to register, might still be booting
-                            Thread.sleep(500);
-                            elapsed += 500;
-                            logger.debug("Cannot reach KIE Server, elapsed time while waiting '{}', max time '{}'", elapsed, waitLimit);
-
-                        }
-                    }
-                    logger.warn("Timeout while trying to register process instance query definition on '{}'", serverInstanceId);
-                } catch (Exception e) {
-                    logger.warn("Unable to register process instance queries on '{}' due to {}", serverInstanceId, e.getMessage(), e);
-                }
-            }
-        });
+        LOGGER.info("Process instance datasets registered");
     }
 
 }

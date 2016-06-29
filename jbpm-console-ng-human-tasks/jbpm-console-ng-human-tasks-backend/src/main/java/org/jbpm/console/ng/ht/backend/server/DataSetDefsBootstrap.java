@@ -15,29 +15,17 @@
  */
 package org.jbpm.console.ng.ht.backend.server;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.dashbuilder.dataset.def.DataColumnDef;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefFactory;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
-import org.dashbuilder.dataset.def.SQLDataSetDef;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
 import org.jbpm.dashboard.dataset.integration.KieServerDataSetProvider;
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.model.definition.QueryDefinition;
-import org.kie.server.client.KieServicesException;
-import org.kie.server.client.QueryServicesClient;
-import org.kie.server.controller.api.model.events.ServerInstanceConnected;
-import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uberfire.commons.async.SimpleAsyncExecutorService;
 import org.uberfire.commons.services.cdi.Startup;
 
 import static org.jbpm.console.ng.ht.model.TaskDataSetConstants.*;
@@ -46,27 +34,18 @@ import static org.jbpm.console.ng.ht.model.TaskDataSetConstants.*;
 @ApplicationScoped
 public class DataSetDefsBootstrap {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataSetDefsBootstrap.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataSetDefsBootstrap.class);
+    private static final  String JBPM_DATA_SOURCE = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
 
     @Inject
     protected DataSetDefRegistry dataSetDefRegistry;
 
-    @Inject
-    private KieServerIntegration kieServerIntegration;
-
-    private DataSetDef humanTasksDef;
-    private DataSetDef humanTasksWithUserDef;
-    private DataSetDef humanTaskWithAdminDef;
-    private DataSetDef humanTasksWithUserDomainDef;
-
     @PostConstruct
     protected void registerDataSetDefinitions() {
-        final String jbpmDataSource = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
-
-        humanTasksDef = DataSetDefFactory.newSQLDataSetDef()
+        DataSetDef humanTasksDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(HUMAN_TASKS_DATASET)
                 .name("Human tasks")
-                .dataSource(jbpmDataSource)
+                .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +
                             "t.activationTime, " +
                             "t.actualOwner, " +
@@ -104,10 +83,10 @@ public class DataSetDefsBootstrap {
                 .number(COLUMN_WORK_ITEM_ID)
                 .buildDef();
 
-        humanTasksWithUserDef = DataSetDefFactory.newSQLDataSetDef()
+        DataSetDef humanTasksWithUserDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(HUMAN_TASKS_WITH_USER_DATASET)
                 .name("Human tasks and users")
-                .dataSource(jbpmDataSource)
+                .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL( "select " +
                             "t.activationTime, " +
                             "t.actualOwner, " +
@@ -152,10 +131,10 @@ public class DataSetDefsBootstrap {
                 .label(COLUMN_ORGANIZATIONAL_ENTITY)
                 .buildDef();
 
-        humanTaskWithAdminDef = DataSetDefFactory.newSQLDataSetDef()
+        DataSetDef humanTaskWithAdminDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(HUMAN_TASKS_WITH_ADMIN_DATASET)
                 .name("Human tasks and admins")
-                .dataSource(jbpmDataSource)
+                .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +
                             "t.activationTime, " +
                             "t.actualOwner, " +
@@ -200,10 +179,10 @@ public class DataSetDefsBootstrap {
                 .label(COLUMN_ORGANIZATIONAL_ENTITY)
                 .buildDef();
 
-       humanTasksWithUserDomainDef = DataSetDefFactory.newSQLDataSetDef()       //Add to this dataset TaskName? to apply with the specified filter
+        DataSetDef humanTasksWithUserDomainDef = DataSetDefFactory.newSQLDataSetDef()       //Add to this dataset TaskName? to apply with the specified filter
                 .uuid(HUMAN_TASKS_WITH_VARIABLES_DATASET)
                 .name("Domain Specific Task")
-                .dataSource(jbpmDataSource)
+                .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +
                             "tvi.taskId, " +
                             "(select ati.name from AuditTaskImpl ati where ati.taskId = tvi.taskId) as \"" + COLUMN_TASK_VARIABLE_TASK_NAME + "\", " +
@@ -233,83 +212,7 @@ public class DataSetDefsBootstrap {
         dataSetDefRegistry.registerDataSetDef(humanTasksWithUserDef);
         dataSetDefRegistry.registerDataSetDef(humanTaskWithAdminDef);
         dataSetDefRegistry.registerDataSetDef(humanTasksWithUserDomainDef);
-        logger.info("Human task datasets registered");
-
+        LOGGER.info("Human task datasets registered");
     }
 
-    public void registerInKieServer(@Observes final ServerInstanceConnected serverInstanceConnected) {
-        final ServerInstance serverInstance = serverInstanceConnected.getServerInstance();
-        final String serverInstanceId = serverInstance.getServerInstanceId();
-        logger.debug("Server instance '{}' connected, registering task related data sets", serverInstanceId);
-
-        SimpleAsyncExecutorService.getDefaultInstance().execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                final String serverTemplateId = serverInstanceConnected.getServerInstance().getServerTemplateId();
-                try {
-                    long waitLimit = 5 * 60 * 1000;   // default 5 min
-                    long elapsed = 0;
-
-                    logger.info("Registering human task data set definitions on connected server instance '{}'", serverInstanceId);
-                    QueryServicesClient queryClient = kieServerIntegration.getAdminServerClient(serverTemplateId).getServicesClient(QueryServicesClient.class);
-                    QueryDefinition humanTasksDefinition = QueryDefinition.builder()
-                            .name(humanTasksDef.getUUID())
-                            .expression(((SQLDataSetDef) humanTasksDef).getDbSQL())
-                            .source(((SQLDataSetDef) humanTasksDef).getDataSource())
-                            .target("CUSTOM")
-                            .build();
-
-                    QueryDefinition humanTasksWithUserDefinition = QueryDefinition.builder()
-                            .name(humanTasksWithUserDef.getUUID())
-                            .expression(((SQLDataSetDef) humanTasksWithUserDef).getDbSQL())
-                            .source(((SQLDataSetDef) humanTasksWithUserDef).getDataSource())
-                            .target("PO_TASK")
-                            .build();
-
-                    QueryDefinition humanTaskWithAdminDefinition = QueryDefinition.builder()
-                            .name(humanTaskWithAdminDef.getUUID())
-                            .expression(((SQLDataSetDef) humanTaskWithAdminDef).getDbSQL())
-                            .source(((SQLDataSetDef) humanTaskWithAdminDef).getDataSource())
-                            .target("BA_TASK")
-                            .build();
-
-                    QueryDefinition humanTasksWithUserDomainDefinition = QueryDefinition.builder()
-                            .name(humanTasksWithUserDomainDef.getUUID())
-                            .expression(((SQLDataSetDef) humanTasksWithUserDomainDef).getDbSQL())
-                            .source(((SQLDataSetDef) humanTasksWithUserDomainDef).getDataSource())
-                            .target("CUSTOM")
-                            .build();
-                    while (elapsed < waitLimit) {
-                        try {
-
-                            queryClient.replaceQuery(humanTasksDefinition);
-                            logger.info("Query {} definition successfully registered on kie server '{}'", HUMAN_TASKS_DATASET, serverInstanceId);
-
-                            queryClient.replaceQuery(humanTasksWithUserDefinition);
-                            logger.info("Query {} definition successfully registered on kie server '{}'", HUMAN_TASKS_WITH_USER_DATASET, serverInstanceId);
-
-                            queryClient.replaceQuery(humanTaskWithAdminDefinition);
-                            logger.info("Query {} definition successfully registered on kie server '{}'", HUMAN_TASKS_WITH_ADMIN_DATASET, serverInstanceId);
-
-                            queryClient.replaceQuery(humanTasksWithUserDomainDefinition);
-                            logger.info("Query {} definition successfully registered on kie server '{}'", HUMAN_TASKS_WITH_VARIABLES_DATASET, serverInstanceId);
-                            return;
-                        } catch (KieServicesException e) {
-                            // unable to register, might still be booting
-                            Thread.sleep(500);
-                            elapsed += 500;
-                            logger.debug("Cannot reach KIE Server, elapsed time while waiting '{}', max time '{}'", elapsed, waitLimit);
-
-                        }
-                    }
-                    logger.warn("Timeout while trying to register task query definition on '{}'", serverInstanceId);
-                } catch (Exception e) {
-                    logger.warn("Unable to register task queries on '{}' due to {}", serverInstanceId, e.getMessage(), e);
-                }
-            }
-        });
-
-    }
 }

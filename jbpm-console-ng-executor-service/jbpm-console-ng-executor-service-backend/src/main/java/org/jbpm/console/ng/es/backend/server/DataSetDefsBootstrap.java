@@ -15,30 +15,17 @@
  */
 package org.jbpm.console.ng.es.backend.server;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.dashbuilder.dataset.def.DataColumnDef;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefFactory;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
-import org.dashbuilder.dataset.def.SQLDataSetDef;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
 import org.jbpm.dashboard.dataset.integration.KieServerDataSetProvider;
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.model.definition.QueryDefinition;
-import org.kie.server.client.KieServicesException;
-import org.kie.server.client.QueryServicesClient;
-import org.kie.server.controller.api.model.events.ServerInstanceConnected;
-import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uberfire.commons.async.DisposableExecutor;
-import org.uberfire.commons.async.SimpleAsyncExecutorService;
 import org.uberfire.commons.services.cdi.Startup;
 
 import static org.jbpm.console.ng.es.model.RequestDataSetConstants.*;
@@ -48,27 +35,17 @@ import static org.jbpm.console.ng.es.model.RequestDataSetConstants.*;
 public class DataSetDefsBootstrap {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSetDefsBootstrap.class);
+    private static final String JBPM_DATA_SOURCE = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
 
     @Inject
     protected DataSetDefRegistry dataSetDefRegistry;
 
-    @Inject
-    private KieServerIntegration kieServerIntegration;
-
-    private DisposableExecutor executor;
-
-    private DataSetDef requestListDef;
-
     @PostConstruct
     protected void registerDataSetDefinitions() {
-        executor = SimpleAsyncExecutorService.getDefaultInstance();
-
-        String jbpmDataSource = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
-
-        requestListDef = DataSetDefFactory.newSQLDataSetDef()
+        DataSetDef requestListDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(REQUEST_LIST_DATASET)
                 .name("Request List")
-                .dataSource(jbpmDataSource)
+                .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select id, timestamp, status, commandName, message, businessKey from RequestInfo", false)
                 .number(COLUMN_ID)
                 .date(COLUMN_TIMESTAMP)
@@ -85,51 +62,6 @@ public class DataSetDefsBootstrap {
         // Register the data set definitions
         dataSetDefRegistry.registerDataSetDef(requestListDef);
         logger.info("Executor service datasets registered");
-    }
-
-    public void registerInKieServer(@Observes final ServerInstanceConnected serverInstanceConnected) {
-        final ServerInstance serverInstance = serverInstanceConnected.getServerInstance();
-        final String serverInstanceId = serverInstance.getServerInstanceId();
-        logger.debug("Server instance '{}' connected, registering job related data sets", serverInstanceId);
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                final String serverTemplateId = serverInstanceConnected.getServerInstance().getServerTemplateId();
-                try {
-                    long waitLimit = 5 * 60 * 1000;   // default 5 min
-                    long elapsed = 0;
-
-                    logger.info("Registering executor data set definition '{}' on connected server instance '{}'", requestListDef.getUUID(), serverInstanceId);
-                    QueryServicesClient queryClient = kieServerIntegration.getAdminServerClient(serverTemplateId).getServicesClient(QueryServicesClient.class);
-                    QueryDefinition definition = QueryDefinition.builder()
-                            .name(requestListDef.getUUID())
-                            .expression(((SQLDataSetDef) requestListDef).getDbSQL())
-                            .source(((SQLDataSetDef) requestListDef).getDataSource())
-                            .target("CUSTOM")
-                            .build();
-                    while (elapsed < waitLimit) {
-                        try {
-
-                            queryClient.replaceQuery(definition);
-                            logger.info("Query {} definition successfully registered on kie server '{}'", REQUEST_LIST_DATASET, serverInstanceId);
-                            return;
-                        } catch (KieServicesException e) {
-                            // unable to register, might still be booting
-                            Thread.sleep(500);
-                            elapsed += 500;
-                            logger.debug("Cannot reach KIE Server, elapsed time while waiting '{}', max time '{}'", elapsed, waitLimit);
-
-                        }
-                    }
-                    logger.warn("Timeout while trying to register query definition '{}' on '{}'", REQUEST_LIST_DATASET, serverInstanceId);
-                } catch (Exception e) {
-                    logger.warn("Unable to register query '{}' on '{}' due to {}", REQUEST_LIST_DATASET, serverInstanceId, e.getMessage(), e);
-                }
-            }
-        });
-
     }
 
 }
