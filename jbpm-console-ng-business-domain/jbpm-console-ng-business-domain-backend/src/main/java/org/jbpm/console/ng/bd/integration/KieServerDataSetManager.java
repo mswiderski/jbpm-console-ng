@@ -20,12 +20,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
 import org.dashbuilder.dataset.def.SQLDataSetDef;
+import org.jbpm.console.ng.ga.events.KieServerDataSetRegistered;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.QueryServicesClient;
@@ -45,6 +47,9 @@ public class KieServerDataSetManager {
 
     @Inject
     private KieServerIntegration kieServerIntegration;
+
+    @Inject
+    private Event<KieServerDataSetRegistered> event;
 
     public void registerInKieServer(@Observes final ServerInstanceConnected serverInstanceConnected) {
         final ServerInstance serverInstance = serverInstanceConnected.getServerInstance();
@@ -85,6 +90,7 @@ public class KieServerDataSetManager {
                             LOGGER.info("Query definition {} successfully registered on kie server '{}'", definition.getName(), serverInstanceId);
                         });
 
+                        event.fire(new KieServerDataSetRegistered(serverInstanceId, serverTemplateId));
                         return;
                     } catch (KieServicesException e) {
                         // unable to register, might still be booting

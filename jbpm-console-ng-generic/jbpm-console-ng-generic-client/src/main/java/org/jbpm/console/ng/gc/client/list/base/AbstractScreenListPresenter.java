@@ -16,7 +16,7 @@
 package org.jbpm.console.ng.gc.client.list.base;
 
 import org.jboss.errai.security.shared.api.identity.User;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelected;
+import org.jbpm.console.ng.ga.events.ServerTemplateSelected;
 import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelectorMenuBuilder;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.lifecycle.OnFocus;

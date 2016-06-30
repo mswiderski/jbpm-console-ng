@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package org.jbpm.console.ng.gc.client.menu;
+package org.jbpm.console.ng.ga.events;
+
+import org.jboss.errai.common.client.api.annotations.Portable;
 
 /**
  * Event fired when a Server Template is selected
  */
+@Portable
 public class ServerTemplateSelected {
 
     private String serverTemplateId;
+
+    public ServerTemplateSelected() {
+    }
 
     public ServerTemplateSelected(String serverTemplateId) {
         this.serverTemplateId = serverTemplateId;
@@ -29,6 +35,10 @@ public class ServerTemplateSelected {
 
     public String getServerTemplateId() {
         return serverTemplateId;
+    }
+
+    public void setServerTemplateId(String serverTemplateId) {
+        this.serverTemplateId = serverTemplateId;
     }
 
     @Override

@@ -25,10 +25,10 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.google.common.collect.FluentIterable;
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.common.client.api.Caller;
-import org.kie.server.controller.api.model.events.ServerInstanceConnected;
+import org.jbpm.console.ng.ga.events.KieServerDataSetRegistered;
+import org.jbpm.console.ng.ga.events.ServerTemplateSelected;
 import org.kie.server.controller.api.model.events.ServerTemplateDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
@@ -119,14 +119,8 @@ public class ServerTemplateSelectorMenuBuilder implements MenuFactory.CustomMenu
         loadServerTemplates();
     }
 
-    public void onServerInstanceConnected(@Observes final ServerInstanceConnected serverInstanceConnected) {
-        //TODO Review better way to handle this delay
-        //Before we can reload the server template, we need to ensure that dataset queries have been registered
-        //on the specific server instance
-        Scheduler.get().scheduleFixedDelay(() -> {
-            loadServerTemplates();
-            return false;
-        }, 5000);
+    public void onKieServerDataSetRegistered(@Observes final KieServerDataSetRegistered kieServerDataSetRegistered) {
+        loadServerTemplates();
     }
 
     @Inject

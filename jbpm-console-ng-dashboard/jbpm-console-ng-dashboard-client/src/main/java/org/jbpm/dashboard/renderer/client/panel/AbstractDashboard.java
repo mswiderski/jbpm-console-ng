@@ -16,8 +16,6 @@
 
 package org.jbpm.dashboard.renderer.client.panel;
 
-import javax.enterprise.event.Observes;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.dashbuilder.dataset.client.DataSetClientServices;
@@ -29,7 +27,6 @@ import org.dashbuilder.displayer.client.DisplayerLocator;
 import org.dashbuilder.renderer.client.metric.MetricDisplayer;
 import org.dashbuilder.renderer.client.table.TableDisplayer;
 import org.jbpm.console.ng.ga.model.dataset.ConsoleDataSetLookup;
-import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelected;
 import org.jbpm.dashboard.renderer.client.panel.formatter.DurationFormatter;
 import org.jbpm.dashboard.renderer.client.panel.i18n.DashboardI18n;
 import org.jbpm.dashboard.renderer.client.panel.widgets.ProcessBreadCrumb;
