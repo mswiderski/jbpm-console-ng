@@ -23,7 +23,7 @@ import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefFactory;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
 import org.jbpm.console.ng.bd.model.ProcessInstanceDataSetConstants;
-import org.jbpm.dashboard.dataset.integration.KieServerDataSetProvider;
+import org.jbpm.console.ng.bd.integration.KieServerDataSetProvider;
 import org.kie.server.api.KieServerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +38,13 @@ public class DataSetDefsBootstrap {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSetDefsBootstrap.class);
     private static final String JBPM_DATA_SOURCE = "${"+ KieServerConstants.CFG_PERSISTANCE_DS + "}";
 
-    public static final String TASKS_MONITORING_DATASET = "tasksMonitoring";
-    public static final String PROCESSES_MONITORING_DATASET = "processesMonitoring";
-
     @Inject
     DataSetDefRegistry dataSetDefRegistry;
 
     @PostConstruct
     protected void registerDataSetDefinitions() {
         DataSetDef processMonitoringDef = DataSetDefFactory.newSQLDataSetDef()
-                .uuid(PROCESSES_MONITORING_DATASET)
+                .uuid(DATASET_PROCESS_INSTANCES)
                 .name("Processes monitoring")
                 .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +
@@ -76,7 +73,7 @@ public class DataSetDefsBootstrap {
                 .buildDef();
 
         DataSetDef taskMonitoringDef = DataSetDefFactory.newSQLDataSetDef()
-                .uuid(TASKS_MONITORING_DATASET)
+                .uuid(DATASET_HUMAN_TASKS)
                 .name("Tasks monitoring")
                 .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +

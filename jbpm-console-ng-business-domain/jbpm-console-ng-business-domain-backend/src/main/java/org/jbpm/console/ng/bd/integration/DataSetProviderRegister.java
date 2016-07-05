@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.dashboard.dataset.integration;
+package org.jbpm.console.ng.bd.integration;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;

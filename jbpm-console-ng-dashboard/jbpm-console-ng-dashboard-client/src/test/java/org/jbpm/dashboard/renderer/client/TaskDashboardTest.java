@@ -23,7 +23,11 @@ import org.dashbuilder.dataset.filter.DataSetFilter;
 import org.dashbuilder.displayer.client.Displayer;
 import org.dashbuilder.renderer.client.metric.MetricDisplayer;
 import org.dashbuilder.renderer.client.table.TableDisplayer;
+import org.jboss.errai.common.client.api.Caller;
+import org.jbpm.console.ng.bd.model.ProcessInstanceKey;
+import org.jbpm.console.ng.bd.model.ProcessInstanceSummary;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.jbpm.dashboard.renderer.client.panel.AbstractDashboard;
 import org.jbpm.dashboard.renderer.client.panel.TaskDashboard;
 import org.jbpm.dashboard.renderer.client.panel.events.TaskDashboardFocusEvent;
@@ -34,6 +38,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.uberfire.client.mvp.PlaceStatus;
+import org.uberfire.mocks.CallerMock;
 
 import static org.dashbuilder.dataset.Assertions.*;
 import static org.jbpm.dashboard.renderer.model.DashboardData.*;
@@ -54,6 +59,11 @@ public class TaskDashboardTest extends AbstractDashboardTest {
 
     @Mock
     Event<TaskDashboardFocusEvent> taskDashboardFocusEvent;
+
+    @Mock
+    ProcessRuntimeDataService processRuntimeDataService;
+
+    Caller<ProcessRuntimeDataService> processRuntimeDataServiceCaller;
 
     TaskDashboard presenter;
     DataSet dataSet;
@@ -79,6 +89,8 @@ public class TaskDashboardTest extends AbstractDashboardTest {
     public void init() throws Exception {
         super.init();
 
+        processRuntimeDataServiceCaller = new CallerMock<ProcessRuntimeDataService>(processRuntimeDataService);
+
         presenter = new TaskDashboard(view,
                 processBreadCrumb,
                 dashboardFactory,
@@ -87,7 +99,9 @@ public class TaskDashboardTest extends AbstractDashboardTest {
                 displayerCoordinator,
                 placeManager,
                 taskSelectionEvent,
-                taskDashboardFocusEvent);
+                taskDashboardFocusEvent,
+                serverTemplateSelectorMenuBuilder,
+                processRuntimeDataServiceCaller);
     }
 
     @Test
@@ -282,14 +296,14 @@ public class TaskDashboardTest extends AbstractDashboardTest {
         DataSet dataSet = displayer.getDataSetHandler().getLastDataSet();
 
         assertDataSetValues(dataSet, new String[][]{
-                {"1.00", "Process A", "Task 1", "user1", "InProgress", "01/01/19 10:00", "", ""},
-                {"4.00", "Process A", "Task 4", "user2", "InProgress", "01/01/19 10:00", "", ""},
-                {"8.00", "Process B", "Task 4", "user4", "Completed", "01/01/19 10:00", "12/02/19 16:00", "10,000.00"},
-                {"2.00", "Process A", "Task 2", "user1", "Completed", "01/01/19 09:00", "01/01/19 13:00", "9,000.00"},
-                {"3.00", "Process A", "Task 3", "user2", "Suspended", "01/01/19 08:00", "", ""},
-                {"7.00", "Process B", "Task 3", "user4", "Reserved", "01/01/19 08:00", "", ""},
-                {"6.00", "Process B", "Task 2", "user3", "Error", "01/01/19 07:00", "", ""},
-                {"5.00", "Process B", "Task 2", "user1", "InProgress", "01/01/19 06:00", "", ""}
+                {"1.00", "Process A", "1.00", "Task 1", "user1", "InProgress", "01/01/19 10:00", "", ""},
+                {"4.00", "Process A", "1.00", "Task 4", "user2", "InProgress", "01/01/19 10:00", "", ""},
+                {"8.00", "Process B", "2.00", "Task 4", "user4", "Completed", "01/01/19 10:00", "12/02/19 16:00", "10,000.00"},
+                {"2.00", "Process A", "1.00", "Task 2", "user1", "Completed", "01/01/19 09:00", "01/01/19 13:00", "9,000.00"},
+                {"3.00", "Process A", "1.00", "Task 3", "user2", "Suspended", "01/01/19 08:00", "", ""},
+                {"7.00", "Process B", "2.00", "Task 3", "user4", "Reserved", "01/01/19 08:00", "", ""},
+                {"6.00", "Process B", "2.00", "Task 2", "user3", "Error", "01/01/19 07:00", "", ""},
+                {"5.00", "Process B", "2.00", "Task 2", "user1", "InProgress", "01/01/19 06:00", "", ""}
         }, 0);
     }
 
@@ -335,9 +349,9 @@ public class TaskDashboardTest extends AbstractDashboardTest {
         // Check that only processes with status=active are shown
         DataSet dataSet = presenter.getTasksTable().getDataSetHandler().getLastDataSet();
         assertDataSetValues(dataSet, new String[][]{
-                {"1.00", "Process A", "Task 1", "user1", "InProgress", "01/01/19 10:00", "", ""},
-                {"4.00", "Process A", "Task 4", "user2", "InProgress", "01/01/19 10:00", "", ""},
-                {"5.00", "Process B", "Task 2", "user1", "InProgress", "01/01/19 06:00", "", ""}
+                {"1.00", "Process A", "1.00", "Task 1", "user1", "InProgress", "01/01/19 10:00", "", ""},
+                {"4.00", "Process A", "1.00", "Task 4", "user2", "InProgress", "01/01/19 10:00", "", ""},
+                {"5.00", "Process B", "2.00", "Task 2", "user1", "InProgress", "01/01/19 06:00", "", ""}
         }, 0);
     }
 
@@ -357,14 +371,14 @@ public class TaskDashboardTest extends AbstractDashboardTest {
         // Check that only tasks with status=InProgress are shown
         DataSet dataSet = presenter.getTasksTable().getDataSetHandler().getLastDataSet();
         assertDataSetValues(dataSet, new String[][]{
-                {"1.00", "Process A", "Task 1", "user1", "InProgress", "01/01/19 10:00", "", ""},
-                {"4.00", "Process A", "Task 4", "user2", "InProgress", "01/01/19 10:00", "", ""},
-                {"8.00", "Process B", "Task 4", "user4", "Completed", "01/01/19 10:00", "12/02/19 16:00", "10,000.00"},
-                {"2.00", "Process A", "Task 2", "user1", "Completed", "01/01/19 09:00", "01/01/19 13:00", "9,000.00"},
-                {"3.00", "Process A", "Task 3", "user2", "Suspended", "01/01/19 08:00", "", ""},
-                {"7.00", "Process B", "Task 3", "user4", "Reserved", "01/01/19 08:00", "", ""},
-                {"6.00", "Process B", "Task 2", "user3", "Error", "01/01/19 07:00", "", ""},
-                {"5.00", "Process B", "Task 2", "user1", "InProgress", "01/01/19 06:00", "", ""}
+                {"1.00", "Process A", "1.00", "Task 1", "user1", "InProgress", "01/01/19 10:00", "", ""},
+                {"4.00", "Process A", "1.00", "Task 4", "user2", "InProgress", "01/01/19 10:00", "", ""},
+                {"8.00", "Process B", "2.00", "Task 4", "user4", "Completed", "01/01/19 10:00", "12/02/19 16:00", "10,000.00"},
+                {"2.00", "Process A", "1.00", "Task 2", "user1", "Completed", "01/01/19 09:00", "01/01/19 13:00", "9,000.00"},
+                {"3.00", "Process A", "1.00", "Task 3", "user2", "Suspended", "01/01/19 08:00", "", ""},
+                {"7.00", "Process B", "2.00", "Task 3", "user4", "Reserved", "01/01/19 08:00", "", ""},
+                {"6.00", "Process B", "2.00", "Task 2", "user3", "Error", "01/01/19 07:00", "", ""},
+                {"5.00", "Process B", "2.00", "Task 2", "user1", "InProgress", "01/01/19 06:00", "", ""}
         }, 0);
     }
 
@@ -384,14 +398,15 @@ public class TaskDashboardTest extends AbstractDashboardTest {
         // Check that only tasks with status=Completed are shown
         DataSet dataSet = presenter.getTasksTable().getDataSetHandler().getLastDataSet();
         assertDataSetValues(dataSet, new String[][]{
-                {"8.00", "Process B", "Task 4", "user4", "Completed", "01/01/19 10:00", "12/02/19 16:00", "10,000.00"},
-                {"2.00", "Process A", "Task 2", "user1", "Completed", "01/01/19 09:00", "01/01/19 13:00", "9,000.00"}
+                {"8.00", "Process B", "2.00", "Task 4", "user4", "Completed", "01/01/19 10:00", "12/02/19 16:00", "10,000.00"},
+                {"2.00", "Process A", "1.00", "Task 2", "user1", "Completed", "01/01/19 09:00", "01/01/19 13:00", "9,000.00"}
         }, 0);
     }
 
 
     @Test
     public void testOpenInstanceDetails() {
+        when(processRuntimeDataService.getProcessInstance(anyString(), any(ProcessInstanceKey.class))).thenReturn(mock(ProcessInstanceSummary.class));
         when(placeManager.getStatus(TaskDashboard.TASK_DETAILS_SCREEN_ID)).thenReturn(PlaceStatus.CLOSE);
         TableDisplayer tableDisplayer = presenter.getTasksTable();
         tableDisplayer.selectCell(COLUMN_TASK_ID, 3);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.dashboard.renderer.model;
+package org.jbpm.console.ng.bd.integration;
 
 import org.dashbuilder.dataprovider.DataSetProviderType;
 import org.dashbuilder.dataset.def.SQLDataSetDef;

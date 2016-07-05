@@ -31,21 +31,6 @@ public class ProcessInstanceSelectionEvent {
     public ProcessInstanceSelectionEvent() {
     }
 
-    public ProcessInstanceSelectionEvent(String deploymentId, Long processInstanceId, String processDefId, String processDefName, Integer processInstanceStatus) {
-        this.processInstanceId = processInstanceId;
-        this.processDefId = processDefId;
-        this.deploymentId = deploymentId;
-        this.processInstanceStatus = processInstanceStatus;
-        this.processDefName = processDefName;
-        this.forLog = false;
-    }
-
-    public ProcessInstanceSelectionEvent(String deploymentId, Long processInstanceId, String processDefId,
-            String processDefName, Integer processInstanceStatus, boolean forLog) {
-        this(deploymentId, processInstanceId, processDefId, processDefName, processInstanceStatus);
-        this.forLog = forLog;
-    }
-
     public ProcessInstanceSelectionEvent(String deploymentId, Long processInstanceId, String processDefId, String processDefName, Integer processInstanceStatus, String serverTemplateId) {
         this.processInstanceId = processInstanceId;
         this.processDefId = processDefId;

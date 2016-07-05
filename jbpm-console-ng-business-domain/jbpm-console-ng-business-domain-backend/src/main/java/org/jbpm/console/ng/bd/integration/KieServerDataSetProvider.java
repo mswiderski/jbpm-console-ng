@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.jbpm.dashboard.dataset.integration;
+package org.jbpm.console.ng.bd.integration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.dashbuilder.dataprovider.DataSetProvider;
 import org.dashbuilder.dataprovider.DataSetProviderType;
@@ -42,22 +41,19 @@ import org.dashbuilder.dataset.impl.DataSetMetadataImpl;
 import org.dashbuilder.dataset.sort.ColumnSort;
 import org.dashbuilder.dataset.sort.DataSetSort;
 import org.dashbuilder.dataset.sort.SortOrder;
-import org.jbpm.console.ng.bd.integration.KieServerIntegration;
 import org.jbpm.console.ng.ga.model.dataset.ConsoleDataSetLookup;
-import org.jbpm.dashboard.renderer.model.KieServerDataSetProviderType;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.client.QueryServicesClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class KieServerDataSetProvider implements DataSetProvider {
+public class KieServerDataSetProvider extends AbstractKieServerService implements DataSetProvider {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(KieServerDataSetProvider.class);
 
     public static final DataSetProviderType TYPE = new KieServerDataSetProviderType();
-
-    @Inject
-    private KieServerIntegration kieServerIntegration;
-
-
 
     @Override
     public DataSetProviderType getType() {
@@ -84,12 +80,12 @@ public class KieServerDataSetProvider implements DataSetProvider {
             throw new IllegalArgumentException("DataSetLookup is of incorrect type " + lookup.getClass().getName());
         }
         ConsoleDataSetLookup dataSetLookup = (ConsoleDataSetLookup) lookup;
+        LOGGER.debug("Data Set lookup using Server Template Id: {}", dataSetLookup.getServerTemplateId());
         if (dataSetLookup.getServerTemplateId() == null || dataSetLookup.getServerTemplateId().isEmpty()) {
-            DataSet result = buildDataSet(def, new ArrayList<>(), new ArrayList<>());
-            return result;
+            return buildDataSet(def, new ArrayList<>(), new ArrayList<>());
         }
 
-        QueryServicesClient queryClient = kieServerIntegration.getServerClient(dataSetLookup.getServerTemplateId()).getServicesClient(QueryServicesClient.class);
+        final QueryServicesClient queryClient = getClient(dataSetLookup.getServerTemplateId(), QueryServicesClient.class);
 
         List<QueryParam> filterParams = new ArrayList<>();
         QueryFilterSpec filterSpec = new QueryFilterSpec();
@@ -150,12 +146,18 @@ public class KieServerDataSetProvider implements DataSetProvider {
             filterSpec.setAscending(sortOrder.equals(SortOrder.ASCENDING));
         }
 
-        final List<List> instances = queryClient.query(dataSetLookup.getDataSetUUID(), QueryServicesClient.QUERY_MAP_RAW, filterSpec, dataSetLookup.getRowOffset()/dataSetLookup.getNumberOfRows(), dataSetLookup.getNumberOfRows(), List.class);
+        final List<List> instances = queryClient.query(
+                dataSetLookup.getDataSetUUID(),
+                QueryServicesClient.QUERY_MAP_RAW,
+                filterSpec,
+                dataSetLookup.getRowOffset() / dataSetLookup.getNumberOfRows(),
+                dataSetLookup.getNumberOfRows(),
+                List.class
+        );
 
-        DataSet result = buildDataSet(def, instances, extraColumns);
+        LOGGER.debug("Query client returned {} row(s)", instances.size());
 
-
-        return result;
+        return buildDataSet(def, instances, extraColumns);
     }
 
     @Override

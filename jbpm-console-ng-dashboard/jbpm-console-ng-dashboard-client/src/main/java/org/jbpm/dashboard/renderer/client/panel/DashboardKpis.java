@@ -21,7 +21,6 @@ import org.dashbuilder.displayer.DisplayerSettings;
 import org.dashbuilder.displayer.DisplayerSettingsFactory;
 import org.dashbuilder.renderer.client.DefaultRenderer;
 import org.jbpm.console.ng.gc.client.util.DateUtils;
-import org.jbpm.dashboard.renderer.client.panel.i18n.DashboardConstants;
 import org.jbpm.dashboard.renderer.client.panel.i18n.DashboardI18n;
 
 import static org.dashbuilder.dataset.filter.FilterFactory.*;
@@ -276,10 +275,7 @@ public class DashboardKpis {
                         .buildSettings();
         }
 
-
         // Task displayers
-
-
         public static DisplayerSettings tasksTable(DashboardI18n i18n) {
                 return DisplayerSettingsFactory.newTableSettings()
                         .uuid(i18n.taskInstances())
@@ -287,6 +283,7 @@ public class DashboardKpis {
                         .dataset(DATASET_HUMAN_TASKS)
                         .column(COLUMN_TASK_ID).format(i18n.taskTableId(), NO_DECIMALS)
                         .column(COLUMN_PROCESS_NAME).format(i18n.taskTableProcess())
+                        .column(COLUMN_PROCESS_INSTANCE_ID).format(i18n.taskTableProcessInstanceId(), NO_DECIMALS)
                         .column(COLUMN_TASK_NAME).format(i18n.taskTableName())
                         .column(COLUMN_TASK_OWNER_ID).format(i18n.taskTableOwner())
                         .column(COLUMN_TASK_STATUS).format(i18n.taskTableStatus())

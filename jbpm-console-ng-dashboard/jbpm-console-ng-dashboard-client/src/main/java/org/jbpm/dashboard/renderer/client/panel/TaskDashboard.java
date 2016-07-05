@@ -37,14 +37,19 @@ import org.dashbuilder.displayer.client.DisplayerListener;
 import org.dashbuilder.displayer.client.DisplayerLocator;
 import org.dashbuilder.renderer.client.metric.MetricDisplayer;
 import org.dashbuilder.renderer.client.table.TableDisplayer;
-import org.jbpm.console.ng.ga.events.ServerTemplateSelected;
+import org.jboss.errai.common.client.api.Caller;
+import org.jbpm.console.ng.bd.model.ProcessInstanceKey;
+import org.jbpm.console.ng.bd.model.ProcessInstanceSummary;
+import org.jbpm.console.ng.gc.client.menu.ServerTemplateSelectorMenuBuilder;
 import org.jbpm.console.ng.ht.model.events.TaskSelectionEvent;
+import org.jbpm.console.ng.pr.service.ProcessRuntimeDataService;
 import org.jbpm.dashboard.renderer.client.panel.events.ProcessDashboardFocusEvent;
 import org.jbpm.dashboard.renderer.client.panel.events.TaskDashboardFocusEvent;
 import org.jbpm.dashboard.renderer.client.panel.formatter.DurationFormatter;
 import org.jbpm.dashboard.renderer.client.panel.widgets.ProcessBreadCrumb;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.PlaceStatus;
+import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 import org.uberfire.mvp.Command;
 
 import static org.jbpm.dashboard.renderer.model.DashboardData.*;
@@ -104,6 +109,8 @@ public class TaskDashboard extends AbstractDashboard implements IsWidget {
     protected List<Displayer> chartsGroup = new ArrayList<Displayer>();
     protected String totalTasksTitle;
 
+    private Caller<ProcessRuntimeDataService> processRuntimeDataService;
+
     @Inject
     public TaskDashboard(final View view,
                          final ProcessBreadCrumb processBreadCrumb,
@@ -113,20 +120,17 @@ public class TaskDashboard extends AbstractDashboard implements IsWidget {
                          final DisplayerCoordinator displayerCoordinator,
                          final PlaceManager placeManager,
                          final Event<TaskSelectionEvent> taskSelectionEvent,
-                         final Event<TaskDashboardFocusEvent> taskDashboardFocusEvent) {
-        super(dashboardFactory, dataSetClientServices, placeManager, view.getI18nService(), processBreadCrumb, displayerLocator, displayerCoordinator);
+                         final Event<TaskDashboardFocusEvent> taskDashboardFocusEvent,
+                         final ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder,
+                         final Caller<ProcessRuntimeDataService> processRuntimeDataService) {
+        super(dashboardFactory, dataSetClientServices, placeManager, view.getI18nService(), processBreadCrumb, displayerLocator, displayerCoordinator, serverTemplateSelectorMenuBuilder);
 
         this.view = view;
         this.taskSelectionEvent = taskSelectionEvent;
         this.taskDashboardFocusEvent = taskDashboardFocusEvent;
+        this.processRuntimeDataService = processRuntimeDataService;
 
         this.init();
-    }
-
-
-    public void onServerTemplateSelected(@Observes final ServerTemplateSelected serverTemplateSelected ) {
-        selectedServerTemplate = serverTemplateSelected.getServerTemplateId();
-        showDashboard();
     }
 
     protected void init() {
@@ -332,13 +336,17 @@ public class TaskDashboard extends AbstractDashboard implements IsWidget {
     public static final String TASK_DETAILS_SCREEN_ID = "Task Details Multi";
 
     public void tableCellSelected(String columnId, int rowIndex) {
-        DataSet ds = tasksTable.getDataSetHandler().getLastDataSet();
-        Long taskId = Double.valueOf(ds.getValueAt(rowIndex, COLUMN_TASK_ID).toString()).longValue();
-        String taskName = ds.getValueAt(rowIndex, COLUMN_TASK_NAME).toString();
+        final DataSet ds = tasksTable.getDataSetHandler().getLastDataSet();
+        final Long taskId = Double.valueOf(ds.getValueAt(rowIndex, COLUMN_TASK_ID).toString()).longValue();
+        final String taskName = ds.getValueAt(rowIndex, COLUMN_TASK_NAME).toString();
+        final Long processInstanceId = Double.valueOf(ds.getValueAt(rowIndex, COLUMN_PROCESS_INSTANCE_ID).toString()).longValue();
+        final String serverTemplateId = serverTemplateSelectorMenuBuilder.getSelectedServerTemplate();
 
-        openTaskDetailsScreen();
-
-        taskSelectionEvent.fire(new TaskSelectionEvent(null, null, taskId, taskName, false, true));
+        processRuntimeDataService.call( (ProcessInstanceSummary p) -> {
+                    openTaskDetailsScreen();
+                    taskSelectionEvent.fire(new TaskSelectionEvent(serverTemplateId, p.getDeploymentId(), taskId, taskName, false, true));
+                }
+        , new DefaultErrorCallback()).getProcessInstance(serverTemplateId, new ProcessInstanceKey(serverTemplateId, processInstanceId));
     }
 
     public void showDashboard() {

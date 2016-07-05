@@ -36,7 +36,6 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.dashbuilder.dataset.filter.FilterFactory.*;
-import static org.jbpm.dashboard.renderer.backend.DataSetDefsBootstrap.*;
 import static org.jbpm.dashboard.renderer.model.DashboardData.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -73,8 +72,8 @@ public class DataSetDefsBootstrapTest {
 
         List<DataSetDef> dataSetDefList = argument.getAllValues();
         assertEquals(dataSetDefList.size(), 2);
-        assertEquals(dataSetDefList.get(0).getUUID(), PROCESSES_MONITORING_DATASET);
-        assertEquals(dataSetDefList.get(1).getUUID(), TASKS_MONITORING_DATASET);
+        assertEquals(dataSetDefList.get(0).getUUID(), DATASET_PROCESS_INSTANCES);
+        assertEquals(dataSetDefList.get(1).getUUID(), DATASET_HUMAN_TASKS);
     }
 
 
@@ -82,7 +81,7 @@ public class DataSetDefsBootstrapTest {
     @Ignore
     public void procInstancesPreprocessorTest() {
         DataSetLookup lookup = DataSetLookupFactory.newDataSetLookupBuilder()
-                .dataset(PROCESSES_MONITORING_DATASET)
+                .dataset(DATASET_PROCESS_INSTANCES)
                 .buildLookup();
 
         dataSetManager.lookupDataSet(lookup);
@@ -90,7 +89,7 @@ public class DataSetDefsBootstrapTest {
 
         verify(dataSetManager).lookupDataSet(argument.capture());
         assertEquals(argument.getValue(), DataSetLookupFactory.newDataSetLookupBuilder()
-                .dataset(PROCESSES_MONITORING_DATASET)
+                .dataset(DATASET_PROCESS_INSTANCES)
                 .filter(in(COLUMN_PROCESS_EXTERNAL_ID, deploymentIds))
                 .buildLookup());
     }
@@ -99,7 +98,7 @@ public class DataSetDefsBootstrapTest {
     @Ignore
     public void tasksPreprocessorTest() {
         DataSetLookup lookup = DataSetLookupFactory.newDataSetLookupBuilder()
-                .dataset(TASKS_MONITORING_DATASET)
+                .dataset(DATASET_HUMAN_TASKS)
                 .buildLookup();
 
         dataSetManager.lookupDataSet(lookup);
@@ -107,7 +106,7 @@ public class DataSetDefsBootstrapTest {
 
         verify(dataSetManager).lookupDataSet(argument.capture());
         assertEquals(argument.getValue(), DataSetLookupFactory.newDataSetLookupBuilder()
-                .dataset(TASKS_MONITORING_DATASET)
+                .dataset(DATASET_HUMAN_TASKS)
                 .filter(in(COLUMN_PROCESS_EXTERNAL_ID, deploymentIds))
                 .buildLookup());
     }

@@ -67,7 +67,7 @@ public class ProcessVariableListPresenterTest {
         when(processVariablesService.getVariableHistory(anyString(), eq(deploymentId), eq(processInstanceId), eq(variableName))).thenReturn(summaries);
         when(view.getListGrid()).thenReturn(extendedPagedTable);
 
-        final ProcessInstanceSelectionEvent event = new ProcessInstanceSelectionEvent(deploymentId, processInstanceId, "processDefId", "processDefName", 1);
+        final ProcessInstanceSelectionEvent event = new ProcessInstanceSelectionEvent(deploymentId, processInstanceId, "processDefId", "processDefName", 1, "serverTemplateIdTest");
 
         presenter.onProcessInstanceSelectionEvent(event);
         presenter.loadVariableHistory(callback, variableName);
