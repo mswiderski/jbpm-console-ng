@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefFactory;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
-import org.jbpm.console.ng.bd.model.ProcessInstanceDataSetConstants;
 import org.jbpm.console.ng.bd.integration.KieServerDataSetProvider;
 import org.kie.server.api.KieServerConstants;
 import org.slf4j.Logger;
@@ -60,8 +59,8 @@ public class DataSetDefsBootstrap {
                         "log.externalId " +
                         "from " +
                         "ProcessInstanceLog log", false)
-                .number(ProcessInstanceDataSetConstants.COLUMN_PROCESS_INSTANCE_ID)
-                .label(ProcessInstanceDataSetConstants.COLUMN_PROCESS_ID)
+                .number(COLUMN_PROCESS_INSTANCE_ID)
+                .label(COLUMN_PROCESS_ID)
                 .date(COLUMN_PROCESS_START_DATE)
                 .date(COLUMN_PROCESS_END_DATE)
                 .number(COLUMN_PROCESS_STATUS)
