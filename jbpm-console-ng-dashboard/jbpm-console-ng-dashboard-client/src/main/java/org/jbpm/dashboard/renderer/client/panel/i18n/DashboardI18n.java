@@ -133,5 +133,7 @@ public interface DashboardI18n {
     String taskTableEndDate();
     String taskTableDuration();
 
+    String taskDetailsNotAvailable();
+
     String displayerNotFound(String name);
 }

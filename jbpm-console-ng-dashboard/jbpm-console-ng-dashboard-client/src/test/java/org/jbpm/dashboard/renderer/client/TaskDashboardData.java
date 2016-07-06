@@ -57,6 +57,7 @@ public class TaskDashboardData extends RawDataSet {
                     {"Process B", "2", "6", "Task 2", "user3", "01/01/19 07:00", "07/01/19 12:00", null, TASK_STATUS_ERROR, null},
                     {"Process B", "2", "7", "Task 3", "user4", "01/01/19 08:00", "05/01/19 12:00", null, TASK_STATUS_RESERVED, null},
                     {"Process B", "2", "8", "Task 4", "user4", "01/01/19 10:00", "05/11/19 12:00", "12/02/19 16:00", TASK_STATUS_COMPLETED, "10000"},
+                    {"Process B", "2", "9", "Task 4", "user4", "01/01/19 10:00", "05/11/19 12:00", null, TASK_STATUS_EXITED, null}
             });
 
     public TaskDashboardData(String[] columnIds, Class[] types, String[][] data) {

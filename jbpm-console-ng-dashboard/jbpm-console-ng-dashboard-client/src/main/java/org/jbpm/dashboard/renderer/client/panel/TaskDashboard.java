@@ -51,6 +51,7 @@ import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.PlaceStatus;
 import org.uberfire.ext.widgets.common.client.callbacks.DefaultErrorCallback;
 import org.uberfire.mvp.Command;
+import org.uberfire.workbench.events.NotificationEvent;
 
 import static org.jbpm.dashboard.renderer.model.DashboardData.*;
 
@@ -110,6 +111,7 @@ public class TaskDashboard extends AbstractDashboard implements IsWidget {
     protected String totalTasksTitle;
 
     private Caller<ProcessRuntimeDataService> processRuntimeDataService;
+    private Event<NotificationEvent> notificationEvent;
 
     @Inject
     public TaskDashboard(final View view,
@@ -122,13 +124,15 @@ public class TaskDashboard extends AbstractDashboard implements IsWidget {
                          final Event<TaskSelectionEvent> taskSelectionEvent,
                          final Event<TaskDashboardFocusEvent> taskDashboardFocusEvent,
                          final ServerTemplateSelectorMenuBuilder serverTemplateSelectorMenuBuilder,
-                         final Caller<ProcessRuntimeDataService> processRuntimeDataService) {
+                         final Caller<ProcessRuntimeDataService> processRuntimeDataService,
+                         final Event<NotificationEvent> notificationEvent) {
         super(dashboardFactory, dataSetClientServices, placeManager, view.getI18nService(), processBreadCrumb, displayerLocator, displayerCoordinator, serverTemplateSelectorMenuBuilder);
 
         this.view = view;
         this.taskSelectionEvent = taskSelectionEvent;
         this.taskDashboardFocusEvent = taskDashboardFocusEvent;
         this.processRuntimeDataService = processRuntimeDataService;
+        this.notificationEvent = notificationEvent;
 
         this.init();
     }
@@ -337,6 +341,12 @@ public class TaskDashboard extends AbstractDashboard implements IsWidget {
 
     public void tableCellSelected(String columnId, int rowIndex) {
         final DataSet ds = tasksTable.getDataSetHandler().getLastDataSet();
+        final String status = ds.getValueAt(rowIndex, COLUMN_TASK_STATUS).toString();
+        if ("Exited".equalsIgnoreCase(status)) {
+            notificationEvent.fire(new NotificationEvent(i18n.taskDetailsNotAvailable(), NotificationEvent.NotificationType.WARNING));
+            return;
+        }
+
         final Long taskId = Double.valueOf(ds.getValueAt(rowIndex, COLUMN_TASK_ID).toString()).longValue();
         final String taskName = ds.getValueAt(rowIndex, COLUMN_TASK_NAME).toString();
         final Long processInstanceId = Double.valueOf(ds.getValueAt(rowIndex, COLUMN_PROCESS_INSTANCE_ID).toString()).longValue();
