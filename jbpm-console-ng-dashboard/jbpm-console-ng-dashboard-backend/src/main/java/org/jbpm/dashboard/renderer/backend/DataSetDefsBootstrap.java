@@ -45,7 +45,7 @@ public class DataSetDefsBootstrap {
     protected void registerDataSetDefinitions() {
         DataSetDef processMonitoringDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(DATASET_PROCESS_INSTANCES)
-                .name("Processes monitoring")
+                .name("FILTERED_PROCESS-Processes monitoring")
                 .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +
                         "log.processInstanceId, " +
@@ -74,7 +74,7 @@ public class DataSetDefsBootstrap {
 
         DataSetDef taskMonitoringDef = DataSetDefFactory.newSQLDataSetDef()
                 .uuid(DATASET_HUMAN_TASKS)
-                .name("Tasks monitoring")
+                .name("FILTERED_PROCESS-Tasks monitoring")
                 .dataSource(JBPM_DATA_SOURCE)
                 .dbSQL("select " +
                                 "p.processName, " +
