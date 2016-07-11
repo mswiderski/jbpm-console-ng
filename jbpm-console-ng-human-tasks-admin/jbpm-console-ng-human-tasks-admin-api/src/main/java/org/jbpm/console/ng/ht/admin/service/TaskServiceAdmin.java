@@ -19,8 +19,8 @@ package org.jbpm.console.ng.ht.admin.service;
 import org.jboss.errai.bus.server.annotations.Remote;
 
 @Remote
-public interface TaskServiceAdminEntryPoint {
-    void generateMockTasks(String userName,int amountOfTasks);
-  
+public interface TaskServiceAdmin {
+
+    void generateMockTasks(String userName, int amountOfTasks);
 
 }

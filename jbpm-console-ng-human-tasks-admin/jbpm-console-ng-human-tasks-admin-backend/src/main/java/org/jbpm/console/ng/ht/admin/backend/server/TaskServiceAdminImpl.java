@@ -15,29 +15,19 @@
  */
 package org.jbpm.console.ng.ht.admin.backend.server;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.jbpm.console.ng.ht.admin.service.TaskServiceAdminEntryPoint;
+import org.jbpm.console.ng.ht.admin.service.TaskServiceAdmin;
 
 
 @Service
 @ApplicationScoped
-public class TaskServiceAdminEntryPointImpl implements TaskServiceAdminEntryPoint {
-
-
-    @PostConstruct
-    public void init(){
-    }
+public class TaskServiceAdminImpl implements TaskServiceAdmin {
 
     @Override
     public void generateMockTasks(String userName, int amountOfTasks) {
-
+        //TODO review implementation based on kie-server
     }
-    
-    
-
-   
 
 }
